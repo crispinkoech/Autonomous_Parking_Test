@@ -5,12 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AutonomousParkingTest {
 
     @Test
-    void shouldAddTwoNumbers() {
+    void TestWhereIs() {
 
-        AutonomousParking calculator = new AutonomousParking();
+        AutonomousParking Car = new AutonomousParking();
+        CarState currPos = Car.WhereIs();
+        assertEquals(0, currPos.getPosition());
+        assertEquals(ParkingStatus.UNPARKED, currPos.getCurrParkingStatus());
+    }
 
-        int result = calculator.add(2, 3);
-
-        assertEquals(6, result);
+    @Test
+    void TestIsEmpty() {
+        AutonomousParking SensorData = new AutonomousParking();
+        int result = SensorData.IsEmpty();
+        assertEquals(200, result);
     }
 }
