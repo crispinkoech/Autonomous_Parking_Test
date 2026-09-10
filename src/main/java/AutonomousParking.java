@@ -17,14 +17,48 @@ public class AutonomousParking implements AutonomousParkingInterface {
   private int[] SensorData2 = {103, 100, 101, 99, 98};
   private int deviationThreshold = 80;
 
-
-
-/**
-Description
-Pre-condition:
-Post-condition:
-Test-cases:
-*/
+  /**
+   * Description:
+   *  - Moves the car forward by 1 meter and checks whether there is an empty space
+   *    to the right of the car in the new position.
+   *  - If there is free space to the right, the parkingState.freeSpots is
+   *    incremented by 1; otherwise, it is reset to zero.
+   *
+   *    Inputs:
+   *      - Queries the car position using the `WhereIs` subroutine
+   *      - Checks if there is free space to the right using `IsEmpty` subroutine
+   *
+   *    Outputs:
+   *      - Returns the parkingState (position and freeSpots)
+   *
+   *    Assumptions:
+   *      - This method is called by the `Park()` method only when the detected
+   *        freeSpots are not enough to park the car (< 5m).
+   *
+   * Pre-condition:
+   *  - 0 <= carState.position <= 499
+   *  - carState.isParked = False
+   *  - 0 <= parkingState.freeSpots <= 4
+   *
+   * Post-condition:
+   *  - 1 <= carState.position <= 500
+   *  - carState.isParked = False
+   *  - 0 <= parkingState.freeSpots <= 5
+   *
+   * Test-cases:
+   *   ______________________________________________________________
+   *  | Conditions/Actions                |                         |
+   *  |-----------------------------------|-------------------------|
+   *  | c1: 0 <= position <= 499          |   T     T     T     F   |
+   *  | c2: 0 <= freeSpots <= 4           |   T     T     F     -   |
+   *  | c3: isEmpty ?                     |   T     F     -     -   |
+   *  |-----------------------------------|-------------------------|
+   *  | a1: wrong input/state             |   -     -     X     X   |
+   *  | a2: position += 1, freeSpots = 0  |   -     X     -     -   |
+   *  | a2: position += 1, freeSpots += 1 |   X     -     -     -   |
+   *  |___________________________________|_________________________|
+   *
+   */
   public CarState MoveForward() {
     CarState currPos = new CarState();
     return currPos;
