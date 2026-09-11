@@ -10,12 +10,30 @@ interface AutonomousParkingInterface {
 }
 
 public class AutonomousParking implements AutonomousParkingInterface {
+  private int currCarPosition;
+  private ParkingStatus currParkingStatus;
+  private int[] SensorData1;
+  private int[] SensorData2;
+  private int deviationThreshold;
+  private int freeSpotsDistanceValid;
+  private int minSensorValue;
+  private int maxSensorValue;
+  private int roadMinStretch;
+  private int roadMaxStretch;
 
-  private int currCarPosition = 0;
-  private ParkingStatus currParkingStatus = ParkingStatus.UNPARKED;
-  private int[] SensorData1 = {101, 100, 102, 104, 105};
-  private int[] SensorData2 = {103, 100, 101, 99, 98};
-  private int deviationThreshold = 80;
+  public AutonomousParking() {
+    this.currCarPosition = 0;
+    this.currParkingStatus = ParkingStatus.UNPARKED;
+    this.SensorData1 = Constant.SENSOR_DATA1;
+    this.SensorData2 = Constant.SENSOR_DATA2;
+    this.deviationThreshold = Constant.SENSOR_DEVIATION_THRESHOLD;
+    this.freeSpotsDistanceValid = Constant.MIN_SENSOR_DETECTED_FREE_SPOT;
+    this.minSensorValue = Constant.SENSOR_MIN_VALUE;
+    this.maxSensorValue = Constant.SENSOR_MAX_VALUE;
+    this.roadMinStretch = Constant.ROAD_MIN_STRETCH;
+    this.roadMaxStretch = Constant.ROAD_MAX_STRETCH;
+  }
+
 
   /**
    * Description:
@@ -72,28 +90,31 @@ Test-cases:
 */
 
   public int IsEmpty() {
+    /* Instantiate sensors */
     DataSensor sensor1 = new DataSensor();
     DataSensor sensor2 = new DataSensor();
     int filteredDataSensor1 = -1;
     int filteredDataSensor2 = -1;
     int filteredData = -1;
 
+    /* Initialize sensors */
     sensor1.SetDataSensor(SensorData1);
     sensor2.SetDataSensor(SensorData2);
 
-    boolean isSensor1Valid = sensor1.FilterNoise(deviationThreshold);
-    boolean isSensor2Valid = sensor2.FilterNoise(deviationThreshold);
+    /* Filter noise and check if sensor data is in range */
+    boolean isSensor1Valid = sensor1.FilterNoise(deviationThreshold) && sensor1.IsDataInRange(minSensorValue, maxSensorValue);
+    boolean isSensor2Valid = sensor2.FilterNoise(deviationThreshold) && sensor2.IsDataInRange(minSensorValue, maxSensorValue);
 
+    /* Calculate filtered data from valid sensors */
     if (isSensor1Valid) {
-        sensor1.CalculateData();
-        filteredDataSensor1 = sensor1.GetDataSensor()[0];
+        filteredDataSensor1 = sensor1.CalculateData();
     }
 
     if (isSensor2Valid) {
-        sensor2.CalculateData();
-        filteredDataSensor2 = sensor2.GetDataSensor()[0];
+        filteredDataSensor2 = sensor2.CalculateData();
     }
 
+    /* Determine the final filtered data based on valid sensor readings */
     if (filteredDataSensor1 != -1 && filteredDataSensor2 != -1) {
         filteredData = Math.min(filteredDataSensor1, filteredDataSensor2);
     }
@@ -104,6 +125,10 @@ Test-cases:
         filteredData = filteredDataSensor2;
     }
 
+    /* Return the filtered data, which represents the distance to the nearest obstacle */
+    /* If both sensors are invalid, return -1 
+       If one sensor is valid, return its data 
+       If both are valid, return the minimum of them */
     return filteredData;
   }
 

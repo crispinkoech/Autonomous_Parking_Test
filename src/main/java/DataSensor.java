@@ -15,6 +15,15 @@ public class DataSensor {
         return sensorData;
     }
 
+    public boolean IsDataInRange(int minValue, int maxValue) {
+        for (int i = 0; i < sensorData.length; i++) {
+            if (sensorData[i] < minValue || sensorData[i] > maxValue) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean FilterNoise(int deviationThreshold) {
         // Implementation for filtering noise from sensor data
         for (int i = 0; i < sensorData.length - 1; i++) {
