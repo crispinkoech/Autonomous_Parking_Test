@@ -127,12 +127,42 @@ Test-cases:
     return "Parking";
   }
 
-/**
-Description
-Pre-condition:
-Post-condition:
-Test-cases:
-*/
+  /**
+   * Description:
+   *  - Moves the car forward (of the start of the 5m parking stretch) and to the left
+   *    of the parking spot.
+   *  - If the car is already unparked, the above functionality is skipped.
+   * 
+   *    Inputs:
+   *      - Queries the car's parked state.
+   *
+   *    Outputs:
+   *      - Modifies the car's parked state (if the car is parked).
+   *
+   *    Assumption:
+   *      - The car's length is less than 5m, such that the extra space allows
+   *        for wiggle room for the car to park or unpark.
+   *
+   * Pre-condition:
+   *  - 1 <= carState.position <= 500
+   *
+   * Post-condition:
+   *  - carState.isParked = False
+   *  - carState.position remains unchanged.
+   *
+   * Test-cases:
+   *   _________________________________________________________________________
+   *  | Conditions/Actions                                      |               |
+   *  |---------------------------------------------------------|---------------|
+   *  | c1: 1 <= position <= 500                                |   T   T   F   |
+   *  | c1: car.isParked ?                                      |   T   F   -   |
+   *  |---------------------------------------------------------|---------------|
+   *  | a1: wrong input/state                                   |   -   -   X   |
+   *  | a2: do nothing                                          |   -   X   -   |
+   *  | a3: carState.isParked = False, car.position is the same |   X   -   -   |
+   *  |_________________________________________________________|_______________|
+   *
+   */
   public String UnPark() {
     return "Unparking";
   }
