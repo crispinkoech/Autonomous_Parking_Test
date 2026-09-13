@@ -1,26 +1,34 @@
 import java.util.ArrayList;
 
 interface AutonomousParkingInterface {
-  public CarState MoveForward();
+  public void MoveForward();
   public int IsEmpty(); 
   public String MoveBackward();
-  public String Park();
+  public boolean Park();
   public String UnPark();
   public CarState WhereIs();
 }
 
 public class AutonomousParking implements AutonomousParkingInterface {
+  /* Car and parking lot status */
   private int currCarPosition;
   private ParkingStatus currParkingStatus;
+  private int freeSpotsDistanceValid;
+  private boolean IsFreeParkingLotDetected;
+  CarState currCarState;
+
+  /* Sensor status */
   private int[] SensorData1;
   private int[] SensorData2;
   private int deviationThreshold;
-  private int freeSpotsDistanceValid;
   private int minSensorValue;
   private int maxSensorValue;
+
+  /* Road conditions */
   private int roadMinStretch;
   private int roadMaxStretch;
 
+  /*Initialize global variables */
   public AutonomousParking() {
     this.currCarPosition = 0;
     this.currParkingStatus = ParkingStatus.UNPARKED;
@@ -28,10 +36,12 @@ public class AutonomousParking implements AutonomousParkingInterface {
     this.SensorData2 = Constant.SENSOR_DATA2;
     this.deviationThreshold = Constant.SENSOR_DEVIATION_THRESHOLD;
     this.freeSpotsDistanceValid = Constant.MIN_SENSOR_DETECTED_FREE_SPOT;
+    this.IsFreeParkingLotDetected = false;
     this.minSensorValue = Constant.SENSOR_MIN_VALUE;
     this.maxSensorValue = Constant.SENSOR_MAX_VALUE;
     this.roadMinStretch = Constant.ROAD_MIN_STRETCH;
     this.roadMaxStretch = Constant.ROAD_MAX_STRETCH;
+    this.currCarState = new CarState();
   }
 
 
@@ -77,9 +87,14 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  |___________________________________|_________________________|
    *
    */
-  public CarState MoveForward() {
-    CarState currPos = new CarState();
-    return currPos;
+  public void MoveForward() {
+    currCarPosition += 1; // Check valid range before increment to 1
+    // Query sensor data using IsEmpty()
+    // Update freeParkingSpots list based on sensor data
+    IsFreeParkingLotDetected = false; // Update True if the freeParkingSpots list is satisfied
+    // Update current car position, free parking lot status for Park()
+    currCarState.SetCurrCarPosition(currCarPosition);
+    currCarState.SetFreeParkingLotStatus(IsFreeParkingLotDetected);
   }
 
   /**
@@ -148,8 +163,23 @@ Pre-condition:
 Post-condition:
 Test-cases:
 */
-  public String Park() {
-    return "Parking";
+  public boolean Park() {
+    /*Keep moving forward until getting a free spot or reaching a upper road stretch limit */
+    while ((false == currCarState.getFreeParkingLotDetectedSts()) && (currCarState.getCurrPosition() < 500))
+    {
+      this.MoveForward(); // move 1m ahead and update car status
+    }
+
+    /*Could not find a free spot at the end of upper road stretch limit */
+    if ((false == currCarState.getFreeParkingLotDetectedSts()) && (currCarState.getCurrPosition() >= 500))
+    {
+      currCarState.SetCurrParkingStatus(ParkingStatus.UNPARKED);
+      return false;
+    }
+
+    /*Otherwise Park successfully */
+    currCarState.SetCurrParkingStatus(ParkingStatus.PARKED);
+    return true;
   }
 
 /**
@@ -169,7 +199,6 @@ Post-condition:
 Test-cases:
 */
   public CarState WhereIs() {
-    CarState currCarState = new CarState(currCarPosition, currParkingStatus);
-    return currCarState;
+    return this.currCarState;
   }
 }
