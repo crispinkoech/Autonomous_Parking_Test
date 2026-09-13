@@ -98,11 +98,40 @@ public class AutonomousParking implements AutonomousParkingInterface {
   }
 
   /**
-Description
-Pre-condition:
-Post-condition:
-Test-cases:
-*/
+   * Description:
+   * - Query both sensors at least 5 times
+   * - Filter noise from each of sensor
+   * - Return the distance to the nearest object on the right-hand side of the car
+   *
+   * Inputs:
+   * - int[] SENSOR_DATA1 = {data_1, data_2, data_3, data_4, data_5};
+   * - int[] SENSOR_DATA2 = {data_1, data_2, data_3, data_4, data_5};
+   *
+   * Outputs:
+   * - Return a filtered distance value in centimetres
+   *
+   * Assumptions:
+   * - Sensor data will be given as an array of 5 elements
+   * - A sensor is considered invalid if its readings have a deviation greater than 80 cm:
+   *   + deviation =  Max reading - Min reading
+   * - Method to calculate overall sensor data is an average of 5 times
+   *
+   * Pre-condition:
+   * - Both sensors data are available
+   * - Sensor data range must be >= 0 and <= 200
+   * - The sensors can be queried at least 5 times.
+   *
+   * Post-condition:
+   * - If both sensors are invalid, return -1 
+   * - If one sensor is valid, return its filtered data 
+   * - If both are valid, return the minimum filtered data of them
+   *
+   * Test-cases:
+   * - Boundary Values
+   * - Equivalence Classes
+   * - Decision Tables
+   * - (Refer to the Test_Specification.xlsm for more details)
+   */
 
   public int IsEmpty() {
     /* Instantiate sensors */

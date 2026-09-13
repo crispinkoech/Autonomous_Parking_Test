@@ -26,11 +26,22 @@ public class DataSensor {
 
     public boolean FilterNoise(int deviationThreshold) {
         // Implementation for filtering noise from sensor data
-        for (int i = 0; i < sensorData.length - 1; i++) {
-            if ((sensorData[i] == -1 )||(Math.abs(sensorData[i] - sensorData[i+1]) > deviationThreshold)) {
-                    return false;
-                }
+        int maxValData = sensorData[0];
+        int minValData = sensorData[0];
+
+        for (int n : sensorData) {
+            if (n > maxValData) {
+                maxValData = n;
             }
+            if (n < minValData) {
+                minValData = n;
+            }
+        }
+
+        if ((maxValData - minValData) > deviationThreshold){
+            return false;
+        }
+        
         return true;
     }
 
