@@ -113,7 +113,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * Assumptions:
    * - Sensor data will be given as an array of 5 elements
    * - A sensor is considered invalid if its readings have a deviation greater than 80 cm:
-   *   + deviation = abs (first  reading - second reading)
+   *   + deviation =  Max reading - Min reading
    * - Method to calculate overall sensor data is an average of 5 times
    *
    * Pre-condition:
@@ -127,7 +127,10 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - If both are valid, return the minimum filtered data of them
    *
    * Test-cases:
-   *
+   * - Boundary Values
+   * - Equivalence Classes
+   * - Decision Tables
+   * - (Refer to the Test_Specification.xlsm for more details)
    */
 
   public int IsEmpty() {
