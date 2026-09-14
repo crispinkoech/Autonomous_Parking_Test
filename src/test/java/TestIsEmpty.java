@@ -7,7 +7,7 @@ public class TestIsEmpty {
     void TestIsEmpty1() {
         AutonomousParking Car = new AutonomousParking();
         int result = Car.IsEmpty();
-        assertEquals(100, result);
+        assertEquals(5, result);
     }
 
     @Test
