@@ -1,5 +1,15 @@
+interface IDataSensor {
+    public void Read();
+    public int[] GetDataSensor();
+    public boolean IsDataInRange();
+    public boolean FilterNoise();
+    public int CalculateData();
+}
+public class DataSensor implements IDataSensor {
 
-public class DataSensor {
+    public static final int SENSOR_MIN_VALUE = 0;
+    public static final int SENSOR_MAX_VALUE = 200;
+    public static final int SENSOR_DEVIATION_THRESHOLD = 80;
 
     private int[] sensorData;
 
@@ -7,24 +17,25 @@ public class DataSensor {
         this.sensorData = new int[] {-1, -1, -1, -1, -1};
     }
 
-    public void SetDataSensor(int[] sensorData) {
-        this.sensorData = sensorData;
+    public void Read() {
+         // Used for testing purposes;
+         this.sensorData = new int[] {101, 100, 102, 104, 105};
     }
 
     public int[] GetDataSensor() {
         return sensorData;
     }
 
-    public boolean IsDataInRange(int minValue, int maxValue) {
+    public boolean IsDataInRange() {
         for (int i = 0; i < sensorData.length; i++) {
-            if (sensorData[i] < minValue || sensorData[i] > maxValue) {
+            if (sensorData[i] < SENSOR_MIN_VALUE || sensorData[i] > SENSOR_MAX_VALUE) {
                 return false;
             }
         }
         return true;
     }
 
-    public boolean FilterNoise(int deviationThreshold) {
+    public boolean FilterNoise() {
         // Implementation for filtering noise from sensor data
         int maxValData = sensorData[0];
         int minValData = sensorData[0];
@@ -38,7 +49,7 @@ public class DataSensor {
             }
         }
 
-        if ((maxValData - minValData) > deviationThreshold){
+        if ((maxValData - minValData) > SENSOR_DEVIATION_THRESHOLD) {
             return false;
         }
         
