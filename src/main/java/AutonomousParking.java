@@ -1,46 +1,38 @@
-import java.util.ArrayList;
-
 interface AutonomousParkingInterface {
-  public void MoveForward();
+  public FreeSpots MoveForward();
   public int IsEmpty(); 
-  public String MoveBackward();
+  public FreeSpots MoveBackward();
   public boolean Park();
   public String UnPark();
   public CarState WhereIs();
 }
 
 public class AutonomousParking implements AutonomousParkingInterface {
+  
+    /* Constants */
+    public static final int ROAD_MIN_STRETCH = 0;
+    public static final int ROAD_MAX_STRETCH = 500;
+    public static final int PARKING_SPOT_LENGTH = 5;
+    public static final int MIN_SENSOR_DETECTED_FREE_SPOT = 150;
+  
   /* Car and parking lot status */
   private int currCarPosition;
   private ParkingStatus currParkingStatus;
-  private int freeSpotsDistanceValid;
-  private boolean IsFreeParkingLotDetected;
+  private int freeSpotsLength;
   CarState currCarState;
 
-  /* Sensor status */
-  private int[] SensorData1;
-  private int[] SensorData2;
-  private int deviationThreshold;
-  private int minSensorValue;
-  private int maxSensorValue;
+  /* Sensors */
+  private IDataSensor sensor1;
+  private IDataSensor sensor2;
 
-  /* Road conditions */
-  private int roadMinStretch;
-  private int roadMaxStretch;
+  /* Set sensors and initial car/parking state */
+  public AutonomousParking(IDataSensor sensor1, IDataSensor sensor2) {
+    this.sensor1 = sensor1;
+    this.sensor2 = sensor2;
 
-  /*Initialize global variables */
-  public AutonomousParking() {
     this.currCarPosition = 0;
     this.currParkingStatus = ParkingStatus.UNPARKED;
-    this.SensorData1 = Constant.SENSOR_DATA1;
-    this.SensorData2 = Constant.SENSOR_DATA2;
-    this.deviationThreshold = Constant.SENSOR_DEVIATION_THRESHOLD;
-    this.freeSpotsDistanceValid = Constant.MIN_SENSOR_DETECTED_FREE_SPOT;
-    this.IsFreeParkingLotDetected = false;
-    this.minSensorValue = Constant.SENSOR_MIN_VALUE;
-    this.maxSensorValue = Constant.SENSOR_MAX_VALUE;
-    this.roadMinStretch = Constant.ROAD_MIN_STRETCH;
-    this.roadMaxStretch = Constant.ROAD_MAX_STRETCH;
+    this.freeSpotsLength = 0;
     this.currCarState = new CarState();
   }
 
@@ -87,14 +79,9 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  |___________________________________|_________________________|
    *
    */
-  public void MoveForward() {
-    currCarPosition += 1; // Check valid range before increment to 1
-    // Query sensor data using IsEmpty()
-    // Update freeParkingSpots list based on sensor data
-    IsFreeParkingLotDetected = false; // Update True if the freeParkingSpots list is satisfied
-    // Update current car position, free parking lot status for Park()
-    currCarState.SetCurrCarPosition(currCarPosition);
-    currCarState.SetFreeParkingLotStatus(IsFreeParkingLotDetected);
+  public FreeSpots MoveForward() {
+    // TODO: Implement MoveForward()
+    return new FreeSpots(currCarPosition, freeSpotsLength);
   }
 
   /**
@@ -134,20 +121,17 @@ public class AutonomousParking implements AutonomousParkingInterface {
    */
 
   public int IsEmpty() {
-    /* Instantiate sensors */
-    DataSensor sensor1 = new DataSensor();
-    DataSensor sensor2 = new DataSensor();
     int filteredDataSensor1 = -1;
     int filteredDataSensor2 = -1;
     int filteredData = -1;
 
-    /* Initialize sensors */
-    sensor1.SetDataSensor(SensorData1);
-    sensor2.SetDataSensor(SensorData2);
+    /* Read data from sensors */
+    sensor1.Read();
+    sensor2.Read();
 
     /* Filter noise and check if sensor data is in range */
-    boolean isSensor1Valid = sensor1.FilterNoise(deviationThreshold) && sensor1.IsDataInRange(minSensorValue, maxSensorValue);
-    boolean isSensor2Valid = sensor2.FilterNoise(deviationThreshold) && sensor2.IsDataInRange(minSensorValue, maxSensorValue);
+    boolean isSensor1Valid = sensor1.FilterNoise() && sensor1.IsDataInRange();
+    boolean isSensor2Valid = sensor2.FilterNoise() && sensor2.IsDataInRange();
 
     /* Calculate filtered data from valid sensors */
     if (isSensor1Valid) {
@@ -212,8 +196,9 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  | a2: position -= 1, freeSpots += 1 |   X     -     -     -   |
    *  |___________________________________|_________________________|
   */
-  public String MoveBackward() {
-    return "Moving Backward";
+  public FreeSpots MoveBackward() {
+    // TODO: Implement MoveBackward()
+    return new FreeSpots(currCarPosition, freeSpotsLength);
   }
 
 /**
