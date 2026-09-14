@@ -26,7 +26,11 @@ class MockDataSensor implements IDataSensor {
     }
 
     public int CalculateData() {
-        return Arrays.stream(mockData).sum();
+        int sum = 0;
+        for (int i = 0; i < mockData.length; i++) {
+            sum += mockData[i];
+        }
+        return (int)(sum/mockData.length);
     }
 }
 
