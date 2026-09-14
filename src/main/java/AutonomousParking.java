@@ -176,12 +176,42 @@ public class AutonomousParking implements AutonomousParkingInterface {
     return filteredData;
   }
 
-/**
-Description
-Pre-condition:
-Post-condition:
-Test-cases:
-*/
+  /**
+   * Description:
+   * - Moves the car backwards by 1 meter
+   * - Checks whether there is empty space to the right of the car
+   * - If there is free space, incremented freeSpots by 1; otherwise reset it to zero.
+   * 
+   * Inputs:
+   * - Queries the car position using `WhereIs` method
+   * - Queries for free space to the right using `IsEmpty` method
+   * 
+   * Outputs:
+   * - Returns the parking state of the car (position and freeSpots detected)
+   *
+   * Pre-condition:
+   * - 2 <= position <= 500
+   * - isParked = False
+   * - 0 <= freeSpots <= 4
+   *
+   * Post-condition:
+   * - 1 <= postion <= 499
+   * - isParked = False
+   * - 0 <= freeSpots <= 5
+   * 
+   * Test-cases:
+   *   ______________________________________________________________
+   *  | Conditions/Actions                |                         |
+   *  |-----------------------------------|-------------------------|
+   *  | c1: 2 <= position <= 500          |   T     T     T     F   |
+   *  | c2: 0 <= freeSpots <= 4           |   T     T     F     -   |
+   *  | c3: isEmpty ?                     |   T     F     -     -   |
+   *  |-----------------------------------|-------------------------|
+   *  | a1: wrong input/state             |   -     -     X     X   |
+   *  | a2: position -= 1, freeSpots = 0  |   -     X     -     -   |
+   *  | a2: position -= 1, freeSpots += 1 |   X     -     -     -   |
+   *  |___________________________________|_________________________|
+  */
   public String MoveBackward() {
     return "Moving Backward";
   }
