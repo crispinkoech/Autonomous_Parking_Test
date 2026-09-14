@@ -9,11 +9,11 @@ interface AutonomousParkingInterface {
 
 public class AutonomousParking implements AutonomousParkingInterface {
   
-    /* Constants */
-    public static final int ROAD_MIN_STRETCH = 0;
-    public static final int ROAD_MAX_STRETCH = 500;
-    public static final int PARKING_SPOT_LENGTH = 5;
-    public static final int MIN_SENSOR_DETECTED_FREE_SPOT = 150;
+  /* Constants */
+  public static final int ROAD_MIN_STRETCH = 0;
+  public static final int ROAD_MAX_STRETCH = 500;
+  public static final int PARKING_SPOT_LENGTH = 5;
+  public static final int MIN_SENSOR_DETECTED_FREE_SPOT = 150;
   
   /* Car and parking lot status */
   private int currCarPosition;
@@ -202,27 +202,69 @@ public class AutonomousParking implements AutonomousParkingInterface {
   }
 
 /**
-Description
-Pre-condition:
-Post-condition:
-Test-cases:
-*/
+   * Description:
+   * - Perform a pre-programmed reverse parallel parking maneuver
+   * - Park when car in the free parking spot position
+   * - Otherwise move the car forwards toward the end of the stretch until free parking spot is found
+   *
+   * Inputs:
+   * - currCarPosition
+   * - freeSpotsLength
+   *
+   * Outputs:
+   * - Return a boolean value
+   *    + True: Car is parked succesfully
+   *    + False: Car is not parked succesfully
+   *
+   * Assumptions:
+   * - A valid parking space is a continuous free stretch of at least 5 meters.
+   * - The car detects parking availability while moving forward using isEmpty().
+   * - The car is considered to be at a ready parking space when a valid 5-meter
+   *   free stretch has been detected.
+   * - The parking maneuver is pre-programmed and does not require sensor
+   *   feedback during the maneuver.
+   * - The actuator signals used to perform the parking maneuver are not
+   *   modeled in this phase.
+   * - If no suitable parking space is found before the end of the street,
+   *   the car remains unparked.
+   *
+   * Pre-condition:
+   * - Car's parking status is currently UNPARKED
+   * - Car's position is in the range between 0 and 500 meters of the stretch
+   *
+   * Post-condition:
+   * - If a suitable free parking stretch of at least 5 meters is detected:
+   *   + The car moves to the end of the stretch.
+   *   + The pre-programmed reverse parallel parking maneuver is performed.
+   *   + The car's parking status becomes PARKED.
+   *
+   * - If no suitable parking stretch is detected before the end of the street:
+   *   + The car's position is 500 meters.
+   *   + The car's parking status remains UNPARKED.
+   *
+   * Test-cases:
+   * - Decision Table
+   * - (Refer to the Test_Specification.xlsm for more details)
+   */
   public boolean Park() {
     /*Keep moving forward until getting a free spot or reaching a upper road stretch limit */
-    while ((false == currCarState.getFreeParkingLotDetectedSts()) && (currCarState.getCurrPosition() < 500))
+    while ((freeSpotsLength < 5) && (currCarPosition < 500))
     {
-      this.MoveForward(); // move 1m ahead and update car status
+      MoveForward(); // move 1m ahead and update car status
+      currCarState.SetCurrCarPosition(currCarPosition); // Update current car position for WhereIs()
     }
 
     /*Could not find a free spot at the end of upper road stretch limit */
-    if ((false == currCarState.getFreeParkingLotDetectedSts()) && (currCarState.getCurrPosition() >= 500))
+    if ((freeSpotsLength < 5) && (currCarPosition >= 500))
     {
-      currCarState.SetCurrParkingStatus(ParkingStatus.UNPARKED);
+      currParkingStatus = ParkingStatus.UNPARKED;
+      currCarState.SetCurrParkingStatus(currParkingStatus);
       return false;
     }
 
     /*Otherwise Park successfully */
-    currCarState.SetCurrParkingStatus(ParkingStatus.PARKED);
+    currParkingStatus = ParkingStatus.PARKED;
+    currCarState.SetCurrParkingStatus(currParkingStatus);
     return true;
   }
 
@@ -243,6 +285,6 @@ Post-condition:
 Test-cases:
 */
   public CarState WhereIs() {
-    return this.currCarState;
+    return currCarState;
   }
 }
