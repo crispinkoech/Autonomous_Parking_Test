@@ -3,7 +3,7 @@ interface AutonomousParkingInterface {
   public int IsEmpty(); 
   public FreeSpots MoveBackward();
   public boolean Park();
-  public String UnPark();
+  public void UnPark();
   public CarState WhereIs();
 }
 
@@ -39,29 +39,29 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * Description:
    *  - Moves the car forward by 1 meter and checks whether there is an empty space
    *    to the right of the car in the new position.
-   *  - If there is free space to the right, the parkingState.freeSpots is
-   *    incremented by 1; otherwise, it is reset to zero.
+   *  - If there is free space to the right, freeSpotsLength is incremented by 1;
+   *    otherwise, it is reset to zero.
    *
-   *    Inputs:
-   *      - Queries the car position using the `WhereIs` subroutine
-   *      - Checks if there is free space to the right using `IsEmpty` subroutine
+   * Inputs:
+   * - Queries for the car's current position
+   * - Checks if there is free space to the right using `IsEmpty` subroutine
    *
-   *    Outputs:
-   *      - Returns the parkingState (position and freeSpots)
+   * Outputs:
+   * - Returns the parkingState (position and freeSpots)
    *
-   *    Assumptions:
-   *      - This method is called by the `Park()` method only when the detected
-   *        freeSpots are not enough to park the car (< 5m).
+   * Assumptions:
+   * - This method is called by the `Park()` method only when the detected
+   *   freeSpots are not enough to park the car (< 5m).
    *
    * Pre-condition:
-   *  - 0 <= carState.position <= 499
-   *  - carState.isParked = False
-   *  - 0 <= parkingState.freeSpots <= 4
+   * - 0 <= carState.position <= 499
+   * - carState.isParked = False
+   * - 0 <= parkingState.freeSpots <= 4
    *
    * Post-condition:
-   *  - 1 <= carState.position <= 500
-   *  - carState.isParked = False
-   *  - 0 <= parkingState.freeSpots <= 5
+   * - 1 <= carState.position <= 500
+   * - carState.isParked = False
+   * - 0 <= parkingState.freeSpots <= 5
    *
    * Test-cases:
    *   ______________________________________________________________
@@ -77,8 +77,23 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  |___________________________________|_________________________|
    *
    */
-  public FreeSpots MoveForward() {
-    // TODO: Implement MoveForward()
+  public FreeSpots MoveForward() throws Error {
+    if (currCarPosition < 0 || currCarPosition > 499) {
+      throw new Error("Invalid car position");
+    }
+    if (freeSpotsLength < 0 || freeSpotsLength > 4) {
+      throw new Error("Invalid free spots length");
+    }
+
+    currCarPosition += 1;
+    int distanceToClosestObject = this.IsEmpty();
+
+    if (distanceToClosestObject >= MIN_SENSOR_DETECTED_FREE_SPOT) {
+      freeSpotsLength += 1;
+    } else {
+      freeSpotsLength = 0;
+    }
+
     return new FreeSpots(currCarPosition, freeSpotsLength);
   }
 
@@ -165,7 +180,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - If there is free space, incremented freeSpots by 1; otherwise reset it to zero.
    * 
    * Inputs:
-   * - Queries the car position using `WhereIs` method
+   * - Queries for the car's current position
    * - Queries for free space to the right using `IsEmpty` method
    * 
    * Outputs:
@@ -195,7 +210,21 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  |___________________________________|_________________________|
   */
   public FreeSpots MoveBackward() {
-    // TODO: Implement MoveBackward()
+    if (currCarPosition < 2 || currCarPosition > 500) {
+      throw new Error("Invalid car position");
+    }
+    if (freeSpotsLength < 0 || freeSpotsLength > 4) {
+      throw new Error("Invalid free spots length");
+    }
+
+    currCarPosition -= 1;
+    int distanceToClosestObject = this.IsEmpty();
+    if (distanceToClosestObject >= MIN_SENSOR_DETECTED_FREE_SPOT) {
+      freeSpotsLength += 1;
+    } else {
+      freeSpotsLength = 0;
+    }
+
     return new FreeSpots(currCarPosition, freeSpotsLength);
   }
 
@@ -299,8 +328,14 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  |_________________________________________________________|_______________|
    *
    */
-  public String UnPark() {
-    return "Unparking";
+  public void UnPark() {
+    if (currCarPosition < 1 || currCarPosition > 500) {
+      throw new Error("Invalid car position");
+    }
+
+    if (currParkingStatus == ParkingStatus.PARKED) {
+      currParkingStatus = ParkingStatus.UNPARKED;
+    }
   }
 
 /**
