@@ -289,6 +289,8 @@ public class AutonomousParking implements AutonomousParkingInterface {
 
     /*Otherwise Park successfully */
     currParkingStatus = ParkingStatus.PARKED;
+    /* Reset free spots length if car is parked successfully */
+    freeSpotsLength = 0;
     return true;
   }
 
