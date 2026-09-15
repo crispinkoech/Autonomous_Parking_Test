@@ -53,17 +53,15 @@ public class AutonomousParkingTest {
     void TestPark() {
         AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
         boolean parkSts = Car.Park();
-        CarState carSts = Car.WhereIs();
         assertEquals(false, parkSts);
-        assertEquals(500, carSts.getCurrPosition());
-        assertEquals(ParkingStatus.UNPARKED, carSts.getCurrParkingStatus());
+        assertEquals(500, Car.currCarPosition);
+        assertEquals(ParkingStatus.UNPARKED, Car.currParkingStatus);
     }
 
     @Test
     void TestWhereIs() {
         AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
-        CarState result = Car.WhereIs();
-        assertEquals(0, result.getCurrPosition());
-        assertEquals(ParkingStatus.UNPARKED, result.getCurrParkingStatus());
+        assertEquals(0, Car.currCarPosition);
+        assertEquals(ParkingStatus.UNPARKED, Car.currParkingStatus);
     }
 }
