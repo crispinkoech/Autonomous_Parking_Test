@@ -16,10 +16,9 @@ public class AutonomousParking implements AutonomousParkingInterface {
   public static final int MIN_SENSOR_DETECTED_FREE_SPOT = 150;
   
   /* Car and parking lot status */
-  private int currCarPosition;
-  private ParkingStatus currParkingStatus;
-  private int freeSpotsLength;
-  CarState currCarState;
+  int currCarPosition;
+  ParkingStatus currParkingStatus;
+  int freeSpotsLength;
 
   /* Sensors */
   private IDataSensor sensor1;
@@ -33,7 +32,6 @@ public class AutonomousParking implements AutonomousParkingInterface {
     this.currCarPosition = 0;
     this.currParkingStatus = ParkingStatus.UNPARKED;
     this.freeSpotsLength = 0;
-    this.currCarState = new CarState();
   }
 
 
@@ -251,20 +249,17 @@ public class AutonomousParking implements AutonomousParkingInterface {
     while ((freeSpotsLength < 5) && (currCarPosition < 500))
     {
       MoveForward(); // move 1m ahead and update car status
-      currCarState.SetCurrCarPosition(currCarPosition); // Update current car position for WhereIs()
     }
 
     /*Could not find a free spot at the end of upper road stretch limit */
     if ((freeSpotsLength < 5) && (currCarPosition >= 500))
     {
       currParkingStatus = ParkingStatus.UNPARKED;
-      currCarState.SetCurrParkingStatus(currParkingStatus);
       return false;
     }
 
     /*Otherwise Park successfully */
     currParkingStatus = ParkingStatus.PARKED;
-    currCarState.SetCurrParkingStatus(currParkingStatus);
     return true;
   }
 
@@ -315,6 +310,6 @@ Post-condition:
 Test-cases:
 */
   public CarState WhereIs() {
-    return currCarState;
+    return new CarState(currCarPosition, currParkingStatus);
   }
 }
