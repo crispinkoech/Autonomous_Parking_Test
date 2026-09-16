@@ -24,14 +24,18 @@ class MockDataSensorIsEmpty extends DataSensor {
 
 }
 public class TestIsEmpty {
-    int[][] sensorData1Sets = {
+
+    @Test // Example
+    void TestExample() {
+
+        int[][] sensorData1SetsExp = {
                             {180, 180, 180, 180, 180},
                             {180, 180, 180, 180, 180},
                             {180, 180, 180, 180, 180},
                             {180, 180, 180, 180, 180},
                             {180, 180, 180, 180, 180},                           
                             };
-    int[][] sensorData2Sets = {
+        int[][] sensorData2SetsExp = {
                             {180, 180, 180, 180, 180},
                             {180, 180, 180, 180, 180},
                             {180, 180, 180, 180, 180},
@@ -39,12 +43,8 @@ public class TestIsEmpty {
                             {180, 180, 180, 180, 180},
                             };
 
-
-    private IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
-    private IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
-
-    @Test
-    void TestPark() {
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1SetsExp);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2SetsExp);
         AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
         Car.currCarPosition = 10;
         boolean doPark = Car.Park();
@@ -56,7 +56,186 @@ public class TestIsEmpty {
         assertEquals(ParkingStatus.UNPARKED, Car.currParkingStatus);
         assertEquals(5, ((MockDataSensorIsEmpty)sensor1).testCount);
 
-        int[] expected = {180, 180, 180, 180, 180};
+        int[] expected = {-1, -1, -1, -1, -1};
         assertArrayEquals(expected, ((MockDataSensorIsEmpty)sensor1).sensorData);
+    }
+        
+    @Test // TC_IE_01
+    void TestBothNormalSensorData() {
+        int[][] sensorData1Sets = {
+                            {101, 100, 102, 104, 105},                         
+                            };
+        int[][] sensorData2Sets = {
+                            {10, 20, 30, 40, 50},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(30, filteredSensorData);
+
+    }
+    @Test // TC_IE_02
+    void TestAbnormalSensorData1() {
+        int[][] sensorData1Sets = {
+                            {10, 100, 25, 44, 88},                    
+                            };
+        int[][] sensorData2Sets = {
+                            {101, 100, 102, 104, 105},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(102, filteredSensorData);
+
+    }
+    @Test // TC_IE_03
+    void TestAbnormalSensorData2() {
+        int[][] sensorData1Sets = {
+                            {150, 120, 155, 145, 160},                    
+                            };
+        int[][] sensorData2Sets = {
+                            {10, 100, 25, 44, 88},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(146, filteredSensorData);
+
+    }
+
+    @Test // TC_IE_04
+    void TestAbnormalBothSensorData() {
+        int[][] sensorData1Sets = {
+                            {111, 22, 35, 12, 180},                    
+                            };
+        int[][] sensorData2Sets = {
+                            {10, 100, 25, 44, 88},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(-1, filteredSensorData);
+
+    }
+    @Test // TC_IE_05
+    void TestNormalBDBothSensorData1() {
+        int[][] sensorData1Sets = {
+                            {0, 1, 0, 1, 0},                    
+                            };
+        int[][] sensorData2Sets = {
+                            {1, 0, 1, 0, 1},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(0, filteredSensorData);
+
+    }
+    @Test // TC_IE_06
+    void TestNormalBDBothSensorData2() {
+        int[][] sensorData1Sets = {
+                            {200, 200, 200, 200, 200},                    
+                            };
+        int[][] sensorData2Sets = {
+                            {200, 200, 200, 200, 200},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(200, filteredSensorData);
+
+    }
+    @Test // TC_IE_07
+    void TestAbnormalBDBothSensorData1() {
+        int[][] sensorData1Sets = {
+                            {-1, -2, -3, -1, 0},                    
+                            };
+        int[][] sensorData2Sets = {
+                            {-1, -2, -3, -1, 0},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(-1, filteredSensorData);
+
+    }
+    @Test // TC_IE_08
+    void TestAbnormalBDBothSensorData2() {
+        int[][] sensorData1Sets = {
+                            {201, 200, 230, 212, 211},                    
+                            };
+        int[][] sensorData2Sets = {
+                            {198, 215, 220, 215, 199},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(-1, filteredSensorData);
+
+    }
+
+    @Test // TC_IE_09
+    void TestNormalBDBothSensorDataNoiseLess() {
+        int[][] sensorData1Sets = {
+                            {97, 99, 120, 99, 111},                    
+                            };
+        int[][] sensorData2Sets = {
+                            {100, 170, 150, 165, 177},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(105, filteredSensorData);
+
+    }
+    @Test // TC_IE_10
+    void TestNormalBDBothSensorDataNoiseEqual() {
+        int[][] sensorData1Sets = {
+                            {97, 99, 120, 99, 111},                    
+                            };
+        int[][] sensorData2Sets = {
+                            {180, 170, 150, 165, 100},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(105, filteredSensorData);
+
+    }
+    @Test // TC_IE_10
+    void TestAbnormalBDBothSensorDataNoise() {
+        int[][] sensorData1Sets = {
+                            {97, 99, 177, 60, 111},                    
+                            };
+        int[][] sensorData2Sets = {
+                            {180, 170, 150, 165, 90},
+                            };
+        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);
+        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);
+        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
+        int filteredSensorData = Car.IsEmpty();
+
+        assertEquals(-1, filteredSensorData);
+
     }
 }
