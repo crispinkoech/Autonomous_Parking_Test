@@ -187,12 +187,12 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - Returns the parking state of the car (position and freeSpots detected)
    *
    * Pre-condition:
-   * - 2 <= position <= 500
+   * - 1 <= position <= 500
    * - isParked = False
    * - 0 <= freeSpots <= 4
    *
    * Post-condition:
-   * - 1 <= postion <= 499
+   * - 0 <= postion <= 499
    * - isParked = False
    * - 0 <= freeSpots <= 5
    * 
@@ -200,7 +200,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *   ______________________________________________________________
    *  | Conditions/Actions                |                         |
    *  |-----------------------------------|-------------------------|
-   *  | c1: 2 <= position <= 500          |   T     T     T     F   |
+   *  | c1: 1 <= position <= 500          |   T     T     T     F   |
    *  | c2: 0 <= freeSpots <= 4           |   T     T     F     -   |
    *  | c3: isEmpty ?                     |   T     F     -     -   |
    *  |-----------------------------------|-------------------------|
@@ -210,7 +210,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  |___________________________________|_________________________|
   */
   public FreeSpots MoveBackward() {
-    if (currCarPosition < 2 || currCarPosition > 500) {
+    if (currCarPosition < 1 || currCarPosition > 500) {
       throw new Error("Invalid car position");
     }
     if (freeSpotsLength < 0 || freeSpotsLength > 4) {
