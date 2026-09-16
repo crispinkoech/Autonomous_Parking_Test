@@ -130,6 +130,20 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - Boundary Values
    * - Equivalence Classes
    * - Decision Tables
+   *   _________________________________________________________________________________
+   *  | Conditions/Actions                                      | R1  | R2  | R3  | R4  |
+   *  |---------------------------------------------------------|-----|-----|-----|-----|
+   *  | c1: S1 state                                            |  V  |  V  |  I  |  I  |
+   *  | c2: S2 state                                            |  V  |  I  |  V  |  I  |
+   *  |---------------------------------------------------------|-----|-----|-----|-----|
+   *  | a1: IsEmpty() = Min(avg(S1), avg(S2))                   |  X  |  -  |  -  |  -  |
+   *  | a2: IsEmpty() = S2                                      |  -  |  X  |  -  |  -  |
+   *  | a3: IsEmpty() = S1                                      |  -  |  -  |  X  |  -  |
+   *  | a4: IsEmpty() = -1                                      |  -  |  -  |  -  |  X  |
+   *  |_________________________________________________________|_____|_____|_____|_____|
+   *
+   *  V = Valid
+   *  I = Invalid
    * - (Refer to the Test_Specification.xlsm for more details)
    */
 
@@ -270,7 +284,20 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *   + The car's parking status remains UNPARKED.
    *
    * Test-cases:
-   * - Decision Table
+   * Decision Table for Park()
+   *
+   *   __________________________________________________________________________
+   *  | Conditions/Actions                                      | R1  | R2  | R3 |
+   *  |---------------------------------------------------------|-----|-----|----|
+   *  | c1: Already at valid parking stretch?                   |  T  |  F  | F  |
+   *  | c2: Valid stretch found ahead?                          |  -  |  T  | F  |
+   *  | c3: End of street reached?                              |  -  |  F  | T  |
+   *  |---------------------------------------------------------|-----|-----|----|
+   *  | a1: Move forward                                        |  -  |  X  | X  |
+   *  | a2: Final status = PARKED                               |  X  |  X  | -  |
+   *  | a3: Final status = UNPARKED                             |  -  |  -  | X  |
+   *  |_________________________________________________________|_____|_____|____|
+   * 
    * - (Refer to the Test_Specification.xlsm for more details)
    */
   public boolean Park() {
