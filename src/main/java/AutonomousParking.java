@@ -376,10 +376,9 @@ public class AutonomousParking implements AutonomousParkingInterface {
 */
   public CarState WhereIs() {
     if (currCarPosition < 0 || currCarPosition > 499){
-      throw new Error("Invalid car position);
+      throw new IllegalStateException("Invalid car position");
     }
-    else{
-      return new CarState(currCarPosition, currParkingStatus);
-    }
+    return new CarState(currCarPosition, currParkingStatus);
+
   }
 }
