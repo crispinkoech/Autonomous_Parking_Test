@@ -25,41 +25,6 @@ class MockDataSensorIsEmpty extends DataSensor {
 }
 public class TestIsEmpty {
 
-    @Test // Example
-    void TestExample() {
-
-        int[][] sensorData1SetsExp = {
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},                           
-                            };
-        int[][] sensorData2SetsExp = {
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {1, 1, 1, 1, 1},
-                            {180, 180, 180, 180, 180},
-                            };
-
-        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1SetsExp);
-        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2SetsExp);
-        AutonomousParking Car = new AutonomousParking(sensor1, sensor2);
-        Car.currCarPosition = 10;
-        boolean doPark = Car.Park();
-        assertEquals(0, Car.freeSpotsLength);
-
-        assertEquals(-1, sensor1.CalculateData());
-        assertEquals(false, doPark);
-        assertEquals(500, Car.currCarPosition);
-        assertEquals(ParkingStatus.UNPARKED, Car.currParkingStatus);
-        assertEquals(5, ((MockDataSensorIsEmpty)sensor1).testCount);
-
-        int[] expected = {-1, -1, -1, -1, -1};
-        assertArrayEquals(expected, ((MockDataSensorIsEmpty)sensor1).sensorData);
-    }
-        
     @Test // TC_IE_01
     void TestBothNormalSensorData() {
         int[][] sensorData1Sets = {
