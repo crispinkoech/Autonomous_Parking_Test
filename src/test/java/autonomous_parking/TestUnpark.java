@@ -14,12 +14,14 @@ public class TestUnpark {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         car.currCarPosition = 0; // Outside the parking range
 
-        Error error = assertThrows(Error.class, () -> car.UnPark());
-        assertEquals(error.getMessage(), "Invalid car position");
+        /* Test for car being below the parking range */
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> car.UnPark());
+        assertEquals(exception.getMessage(), "Invalid car position");
 
-        car.currCarPosition = 501; // Outside the parking range
-        error = assertThrows(Error.class, () -> car.UnPark());
-        assertEquals(error.getMessage(), "Invalid car position");
+        /* Test for car being beyond the parking range */
+        car.currCarPosition = 501;
+        exception = assertThrows(IllegalStateException.class, () -> car.UnPark());
+        assertEquals(exception.getMessage(), "Invalid car position");
     }
 
     @Test
@@ -27,6 +29,7 @@ public class TestUnpark {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         car.currCarPosition = 1; // Keep car within parking range
 
+        /* Test the new car position and parking status */
         assertDoesNotThrow(() -> car.UnPark());
         assertEquals(1, car.currCarPosition); // Car position should be unchanged
         assertEquals(ParkingStatus.UNPARKED, car.currParkingStatus); // Car should still be unparked
@@ -38,6 +41,7 @@ public class TestUnpark {
         car.currCarPosition = 1; // Keep car within parking range
         car.currParkingStatus = ParkingStatus.PARKED; // Car is parked
 
+        /* Test the new car position and parking status */
         assertDoesNotThrow(() -> car.UnPark());
         assertEquals(1, car.currCarPosition); // Car position should be unchanged
         assertEquals(ParkingStatus.UNPARKED, car.currParkingStatus); // Car should still be unparked
