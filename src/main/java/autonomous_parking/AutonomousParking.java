@@ -139,8 +139,8 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  | c2: S2 state                                            |  V  |  I  |  V  |  I  |
    *  |---------------------------------------------------------|-----|-----|-----|-----|
    *  | a1: IsEmpty() = Min(avg(S1), avg(S2))                   |  X  |  -  |  -  |  -  |
-   *  | a2: IsEmpty() = S2                                      |  -  |  X  |  -  |  -  |
-   *  | a3: IsEmpty() = S1                                      |  -  |  -  |  X  |  -  |
+   *  | a2: IsEmpty() = S1                                      |  -  |  X  |  -  |  -  |
+   *  | a3: IsEmpty() = S2                                      |  -  |  -  |  X  |  -  |
    *  | a4: IsEmpty() = -1                                      |  -  |  -  |  -  |  X  |
    *  |_________________________________________________________|_____|_____|_____|_____|
    *
