@@ -73,7 +73,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  |-----------------------------------|-----|-----|-----|-----|
    *  | a1: wrong input/state             |  -  |  -  |  X  |  X  |
    *  | a2: position += 1, freeSpots = 0  |  -  |  X  |  -  |  -  |
-   *  | a2: position += 1, freeSpots += 1 |  X  |  -  |  -  |  -  |
+   *  | a3: position += 1, freeSpots += 1 |  X  |  -  |  -  |  -  |
    *  |___________________________________|_____|_____|_____|_____|
    *
    */
@@ -224,7 +224,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  |-----------------------------------|-----|-----|-----|-----|
    *  | a1: wrong input/state             |  -  |  -  |  X  |  X  |
    *  | a2: position -= 1, freeSpots = 0  |  -  |  X  |  -  |  -  |
-   *  | a2: position -= 1, freeSpots += 1 |  X  |  -  |  -  |  -  |
+   *  | a3: position -= 1, freeSpots += 1 |  X  |  -  |  -  |  -  |
    *  |___________________________________|_____|_____|_____|_____|
   */
   public FreeSpots MoveBackward() {
