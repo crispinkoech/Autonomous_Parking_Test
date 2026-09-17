@@ -1,3 +1,5 @@
+package autonomous_parking;
+
 interface AutonomousParkingInterface {
   public FreeSpots MoveForward();
   public int IsEmpty(); 

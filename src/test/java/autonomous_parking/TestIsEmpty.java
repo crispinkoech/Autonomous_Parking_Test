@@ -1,29 +1,31 @@
+package autonomous_parking;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-class MockDataSensorIsEmpty extends DataSensor {
 
-    int testCount = 0;
-    int[][] sensorDataSets;
-
-    public MockDataSensorIsEmpty(int[][] sensorDataSets)
-    {
-        this.sensorData = sensorDataSets[0];
-        this.sensorDataSets = sensorDataSets;
-    }
-
-    @Override public void Read() {
-        sensorData = new int[] {-1, -1, -1, -1, -1};
-        if (testCount < sensorDataSets.length)
-        {
-            sensorData = sensorDataSets[testCount];
-            testCount++;
-        }
-    }
-
-}
 public class TestIsEmpty {
+    class MockDataSensorIsEmpty extends DataSensor {
+
+        int testCount = 0;
+        int[][] sensorDataSets;
+    
+        public MockDataSensorIsEmpty(int[][] sensorDataSets)
+        {
+            this.sensorData = sensorDataSets[0];
+            this.sensorDataSets = sensorDataSets;
+        }
+    
+        @Override public void Read() {
+            sensorData = new int[] {-1, -1, -1, -1, -1};
+            if (testCount < sensorDataSets.length)
+            {
+                sensorData = sensorDataSets[testCount];
+                testCount++;
+            }
+        }
+    
+    }
 
     @Test // TC_IE_01
     void TestBothNormalSensorData() {

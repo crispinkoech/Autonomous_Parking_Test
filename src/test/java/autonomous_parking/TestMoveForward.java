@@ -1,5 +1,9 @@
+package autonomous_parking;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
+import autonomous_parking.mocks.MockDataSensor;
 
 public class TestMoveForward {
     private IDataSensor sensor1 = new MockDataSensor(new int[] {101, 100, 102, 104, 105});

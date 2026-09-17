@@ -1,3 +1,5 @@
+package autonomous_parking;
+
 public class FreeSpots {
     int position;
     int freeSpotsLength;

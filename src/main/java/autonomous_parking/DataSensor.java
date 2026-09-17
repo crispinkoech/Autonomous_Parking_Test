@@ -1,3 +1,5 @@
+package autonomous_parking;
+
 interface IDataSensor {
     public void Read();
     public int[] GetDataSensor();
@@ -11,7 +13,7 @@ public class DataSensor implements IDataSensor {
     public static final int SENSOR_MAX_VALUE = 200;
     public static final int SENSOR_DEVIATION_THRESHOLD = 80;
 
-    int[] sensorData;
+    protected int[] sensorData;
 
     public DataSensor() {
         this.sensorData = new int[] {-1, -1, -1, -1, -1};
