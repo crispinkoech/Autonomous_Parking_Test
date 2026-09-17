@@ -1,7 +1,8 @@
-import org.junit.jupiter.api.Test;
+package autonomous_parking;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 class MockDataSensorIsEmpty extends DataSensor {
 
     int testCount = 0;
@@ -23,6 +24,7 @@ class MockDataSensorIsEmpty extends DataSensor {
     }
 
 }
+
 public class TestPark {
 
     @Test // Example

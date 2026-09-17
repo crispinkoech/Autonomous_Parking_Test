@@ -1,3 +1,5 @@
+package autonomous_parking;
+
 enum ParkingStatus {
     PARKED,
     UNPARKED
