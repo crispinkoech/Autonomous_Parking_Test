@@ -378,16 +378,16 @@ public class AutonomousParking implements AutonomousParkingInterface {
  *      - Returns the car's current position and parking state.
  *
  * Pre-condition:
- * - 0 < currCarPosition <= 499
+ * - 0 <= currCarPosition <= 500
  *
  * Post-condition:
- * - 0 < currCarPosition <= 499
+ * - 0 <= currCarPosition <= 500
  *
  * Test-cases:
  *  __________________________________________________________________
  * | Conditions/Actions                   |                           |
  * |--------------------------------------|---------------------------|
- * | c1: 1 <= currCarPosition <= 500      |   F   T   T   T   T   T   |
+ * | c1: 0 <= currCarPosition <= 500      |   F   T   T   T   T   T   |
  * | c2: MoveForward method called?       |   -   T   -   -   -   -   |
  * | c3: MoveBackward method called?      |   -   -   T   -   -   -   |
  * | c4: currentParkingStatus = PARKED?   |   -   -   -   T   F   -   |
@@ -397,16 +397,15 @@ public class AutonomousParking implements AutonomousParkingInterface {
  * | a2: currCarPosition += 1             |       X   -   -   -   -   |
  * | a3: currCarPosition -= 1             |       -   X   -   -   -   |
  * | a4: currentParkingStatus = PARKED    |               X   -   -   |
- * | a5: currentParkingStatus = UNPARKED  |                  X   X    |
+ * | a5: currentParkingStatus = UNPARKED  |       X   X       X   X   |
  * |______________________________________|___________________________|
  *
 */
   public CarState WhereIs() {
-    if (currCarPosition < 0 || currCarPosition > 499){
-      throw new Error("Invalid car position);
+    if (currCarPosition < 0 || currCarPosition > 500){
+      throw new IllegalStateException("Invalid car position");
     }
-    else{
-      return new CarState(currCarPosition, currParkingStatus);
-    }
+    return new CarState(currCarPosition, currParkingStatus);
+
   }
 }
