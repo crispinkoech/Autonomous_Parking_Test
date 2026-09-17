@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import autonomous_parking.mocks.MockDataSensor;
 
 public class TestWhereIs {
-    @Test
+    @Test //TC-WI-01
     void WhereIsRejectsInvalidPosition() {
         AutonomousParking car = new AutonomousParking(
                 new MockDataSensor(new int[] {101, 100, 102, 104, 105}),
@@ -22,7 +22,7 @@ public class TestWhereIs {
         System.out.println(error.getMessage());
     }
 
-    @Test
+    @Test //TC-WI-02
     void WhereIsReturnsCorrectStateAfterMoveForward(){
         AutonomousParking car = new AutonomousParking(
                 new MockDataSensor(new int[] {101, 100, 102, 104, 105}),
@@ -38,7 +38,7 @@ public class TestWhereIs {
         assertEquals(ParkingStatus.UNPARKED, state.CurrParkingStatus);
     }
 
-    @Test
+    @Test //TC-WI-03
     void WhereIsReturnsCorrectStateAfterMoveBackward(){
         AutonomousParking car = new AutonomousParking(
                 new MockDataSensor(new int[] {101, 100, 102, 104, 105}),
@@ -54,7 +54,7 @@ public class TestWhereIs {
         assertEquals(ParkingStatus.UNPARKED, state.CurrParkingStatus);
     }
 
-    @Test
+    @Test //TC-WI-04
     void WhereIsReturnsParkedState(){
         AutonomousParking car = new AutonomousParking(
                 new MockDataSensor(new int[] {101, 100, 102, 104, 105}),
@@ -69,7 +69,7 @@ public class TestWhereIs {
         assertEquals(ParkingStatus.PARKED, state.CurrParkingStatus);
     }
 
-    @Test
+    @Test //TC-WI-05
     void WhereIsReturnsUnparkedState(){
         AutonomousParking car = new AutonomousParking(
                 new MockDataSensor(new int[] {101, 100, 102, 104, 105}),
@@ -84,7 +84,7 @@ public class TestWhereIs {
         assertEquals(ParkingStatus.UNPARKED, state.CurrParkingStatus);
     }
 
-    @Test
+    @Test //TC-WI-06
     void WhereIsReturnsCorrectStateAfterUnPark(){
         AutonomousParking car = new AutonomousParking(
                 new MockDataSensor(new int[] {101, 100, 102, 104, 105}),
