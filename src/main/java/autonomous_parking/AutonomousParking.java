@@ -57,39 +57,43 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *
    * Pre-condition:
    * - 0 <= carState.position <= 499
-   * - carState.isParked = False
-   * - 0 <= parkingState.freeSpots <= 4
+   * - car.ParkingState = UNPARKED
    *
    * Post-condition:
    * - 1 <= carState.position <= 500
-   * - carState.isParked = False
-   * - 0 <= parkingState.freeSpots <= 5
+   * - carParkingState = UNPARKED
    *
    * Test-cases:
-   *   ______________________________________________________________
-   *  | Conditions/Actions                |                         |
-   *  |-----------------------------------|-------------------------|
-   *  | c1: 0 <= position <= 499          |   T     T     T     F   |
-   *  | c2: 0 <= freeSpots <= 4           |   T     T     F     -   |
-   *  | c3: isEmpty ?                     |   T     F     -     -   |
-   *  |-----------------------------------|-------------------------|
-   *  | a1: wrong input/state             |   -     -     X     X   |
-   *  | a2: position += 1, freeSpots = 0  |   -     X     -     -   |
-   *  | a2: position += 1, freeSpots += 1 |   X     -     -     -   |
-   *  |___________________________________|_________________________|
+   *   ___________________________________________________________
+   *  | Conditions/Actions                | R1  | R2  | R3  | R4  |
+   *  |-----------------------------------|-----|-----|-----|-----|
+   *  | c1: 0 <= position <= 499          |  T  |  T  |  T  |  F  |
+   *  | c2: carParkingState = UNPARKED    |  T  |  T  |  F  |  -  |
+   *  | c3: isEmpty() >= 150cm            |  T  |  F  |  -  |  -  |
+   *  |-----------------------------------|-----|-----|-----|-----|
+   *  | a1: wrong input/state             |  -  |  -  |  X  |  X  |
+   *  | a2: position += 1, freeSpots = 0  |  -  |  X  |  -  |  -  |
+   *  | a2: position += 1, freeSpots += 1 |  X  |  -  |  -  |  -  |
+   *  |___________________________________|_____|_____|_____|_____|
    *
    */
-  public FreeSpots MoveForward() throws Error {
-    if (currCarPosition < 0 || currCarPosition > 499) {
-      throw new Error("Invalid car position");
-    }
-    if (freeSpotsLength < 0 || freeSpotsLength > 4) {
-      throw new Error("Invalid free spots length");
+  public FreeSpots MoveForward() {
+    /* Check that the car position is still in range (0 to 499) */
+    CarState carState = this.WhereIs();
+    if (carState.position < 0 || carState.position > 499) {
+      throw new IllegalStateException("Invalid car position");
     }
 
+    /* Check that the car is not parked */
+    if (carState.CurrParkingStatus == ParkingStatus.PARKED) {
+      throw new IllegalStateException("Car is already parked");
+    }
+
+    /* Increment car position */
     currCarPosition += 1;
-    int distanceToClosestObject = this.IsEmpty();
 
+    /* Increment or reset the detected free space */
+    int distanceToClosestObject = this.IsEmpty();
     if (distanceToClosestObject >= MIN_SENSOR_DETECTED_FREE_SPOT) {
       freeSpotsLength += 1;
     } else {
@@ -204,36 +208,41 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *
    * Pre-condition:
    * - 1 <= position <= 500
-   * - isParked = False
-   * - 0 <= freeSpots <= 4
+   * - carParkingState = UNPARKED
    *
    * Post-condition:
    * - 0 <= postion <= 499
-   * - isParked = False
-   * - 0 <= freeSpots <= 5
+   * - carParkingState = UNPARKED
    * 
    * Test-cases:
-   *   ______________________________________________________________
-   *  | Conditions/Actions                |                         |
-   *  |-----------------------------------|-------------------------|
-   *  | c1: 1 <= position <= 500          |   T     T     T     F   |
-   *  | c2: 0 <= freeSpots <= 4           |   T     T     F     -   |
-   *  | c3: isEmpty ?                     |   T     F     -     -   |
-   *  |-----------------------------------|-------------------------|
-   *  | a1: wrong input/state             |   -     -     X     X   |
-   *  | a2: position -= 1, freeSpots = 0  |   -     X     -     -   |
-   *  | a2: position -= 1, freeSpots += 1 |   X     -     -     -   |
-   *  |___________________________________|_________________________|
+   *   ___________________________________________________________
+   *  | Conditions/Actions                | R1  | R2  | R3  | R4  |
+   *  |-----------------------------------|-----|-----|-----|-----|
+   *  | c1: 1 <= position <= 500          |  T  |  T  |  T  |  F  |
+   *  | c2: carParkingState = UNPARKED    |  T  |  T  |  F  |  -  |
+   *  | c3: isEmpty() >= 150cm            |  T  |  F  |  -  |  -  |
+   *  |-----------------------------------|-----|-----|-----|-----|
+   *  | a1: wrong input/state             |  -  |  -  |  X  |  X  |
+   *  | a2: position -= 1, freeSpots = 0  |  -  |  X  |  -  |  -  |
+   *  | a2: position -= 1, freeSpots += 1 |  X  |  -  |  -  |  -  |
+   *  |___________________________________|_____|_____|_____|_____|
   */
   public FreeSpots MoveBackward() {
-    if (currCarPosition < 1 || currCarPosition > 500) {
-      throw new Error("Invalid car position");
-    }
-    if (freeSpotsLength < 0 || freeSpotsLength > 4) {
-      throw new Error("Invalid free spots length");
+    /* Check that the car position is still in range (1 to 500) */
+    CarState carState = this.WhereIs();
+    if (carState.position < 1 || carState.position > 500) {
+      throw new IllegalStateException("Invalid car position");
     }
 
+    /* Check that the car is not parked */
+    if (carState.CurrParkingStatus == ParkingStatus.PARKED) {
+      throw new IllegalStateException("Car is already parked");
+    }
+
+    /* Decrement car position */
     currCarPosition -= 1;
+
+    /* Increment or reset the detected free space */
     int distanceToClosestObject = this.IsEmpty();
     if (distanceToClosestObject >= MIN_SENSOR_DETECTED_FREE_SPOT) {
       freeSpotsLength += 1;
@@ -325,47 +334,48 @@ public class AutonomousParking implements AutonomousParkingInterface {
 
   /**
    * Description:
-   *  - Moves the car forward (of the start of the 5m parking stretch) and to the left
-   *    of the parking spot.
-   *  - If the car is already unparked, the above functionality is skipped.
+   * - Moves the car forward (of the start of the 5m parking stretch) and to the left
+   *   of the parking spot.
+   * - If the car is already unparked, the above functionality is skipped.
    * 
-   *    Inputs:
-   *      - Queries the car's parked state.
+   * Inputs:
+   * - Queries the car's parked state.
    *
-   *    Outputs:
-   *      - Modifies the car's parked state (if the car is parked).
+   * Outputs:
+   * - Modifies the car's parked state (if the car is parked).
    *
-   *    Assumption:
-   *      - The car's length is less than 5m, such that the extra space allows
-   *        for wiggle room for the car to park or unpark.
+   * Assumption:
+   * - The car's length is < 5m, such that the extra space offers wiggle room to unpark
+   *   and maintain the initial position before parking
    *
    * Pre-condition:
-   *  - 1 <= carState.position <= 500
+   * - 1 <= carState.position <= 500
    *
    * Post-condition:
-   *  - carState.isParked = False
-   *  - carState.position remains unchanged.
+   * - carParkingState = UNPARKED
+   * - carState.position remains unchanged.
    *
    * Test-cases:
-   *   _________________________________________________________________________
-   *  | Conditions/Actions                                      |               |
-   *  |---------------------------------------------------------|---------------|
-   *  | c1: 1 <= position <= 500                                |   T   T   F   |
-   *  | c1: car.isParked ?                                      |   T   F   -   |
-   *  |---------------------------------------------------------|---------------|
-   *  | a1: wrong input/state                                   |   -   -   X   |
-   *  | a2: do nothing                                          |   -   X   -   |
-   *  | a3: carState.isParked = False, car.position is the same |   X   -   -   |
-   *  |_________________________________________________________|_______________|
+   *   _____________________________________________________________________________
+   *  | Conditions/Actions                                        | R1  | R2  | R3  |
+   *  |-----------------------------------------------------------|-----|-----|-----|
+   *  | c1: 1 <= position <= 500                                  |  T  |  T  |  F  |
+   *  | c1: carParkingState = PARKED                              |  T  |  F  |  -  |
+   *  |-----------------------------------------------------------|-----|-----|-----|
+   *  | a1: wrong input/state                                     |  -  |  -  |  X  |
+   *  | a2: do nothing                                            |  -  |  X  |  -  |
+   *  | a3: carParkingState = UNPARKED, car.position is the same  |  X  |  -  |  -  |
+   *  |___________________________________________________________|_____|_____|_____|
    *
    */
   public void UnPark() {
-    if (currCarPosition < 1 || currCarPosition > 500) {
-      throw new Error("Invalid car position");
+    CarState carState = this.WhereIs();
+    if (carState.position < 1 || carState.position > 500) {
+      throw new IllegalStateException("Invalid car position");
     }
 
-    if (currParkingStatus == ParkingStatus.PARKED) {
-      currParkingStatus = ParkingStatus.UNPARKED;
+    if (carState.CurrParkingStatus == ParkingStatus.PARKED) {
+      this.currParkingStatus = ParkingStatus.UNPARKED;
     }
   }
 

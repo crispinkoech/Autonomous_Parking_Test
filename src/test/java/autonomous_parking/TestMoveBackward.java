@@ -14,27 +14,25 @@ public class TestMoveBackward {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         car.currCarPosition = 0;
 
-        Error error = assertThrows(Error.class, () -> car.MoveBackward());
-        assertEquals(error.getMessage(), "Invalid car position");
+        /* Test for the car's position being below the required range */
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> car.MoveBackward());
+        assertEquals(exception.getMessage(), "Invalid car position");
 
+        /* Test for the car's position being beyond the required range */
         car.currCarPosition = 501;
-        error = assertThrows(Error.class, () -> car.MoveBackward());
-        assertEquals(error.getMessage(), "Invalid car position");
+        exception = assertThrows(IllegalStateException.class, () -> car.MoveBackward());
+        assertEquals(exception.getMessage(), "Invalid car position");
     }
 
     @Test
-    void MoveBackwardRejectsInvalidNumberOfFreeSpots() {
+    void MoveBackwardRejectsInvalidParkingState() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         car.currCarPosition = 1;
 
-        car.freeSpotsLength = -1;
-
-        Error error = assertThrows(Error.class, () -> car.MoveBackward());
-        assertEquals(error.getMessage(), "Invalid free spots length");
-
-        car.freeSpotsLength = 10;
-        error = assertThrows(Error.class, () -> car.MoveBackward());
-        assertEquals(error.getMessage(), "Invalid free spots length");
+        /* Test for the car being in a unwanted parked state */
+        car.currParkingStatus = ParkingStatus.PARKED;
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> car.MoveBackward());
+        assertEquals(exception.getMessage(), "Car is already parked");
     }
 
     @Test
@@ -45,6 +43,7 @@ public class TestMoveBackward {
         // Assume we had already detected free 3m before this
         car.freeSpotsLength = 2;
 
+        /* Test that car position decreases and detected free spots resets */
         FreeSpots freeSpots = assertDoesNotThrow(() -> car.MoveBackward());
         assertEquals(0, freeSpots.position); // Car position should be 1
         assertEquals(0, freeSpots.freeSpotsLength); // Detected free spots should be reset.
@@ -52,6 +51,7 @@ public class TestMoveBackward {
 
     @Test
     void MoveBackwardDecrementsPositionAndIncrementsFreeSpotsByOne() {
+        // Use a mock sensor that will report the right side to be free
         AutonomousParking car = new AutonomousParking(
             new MockDataSensor(new int [] {151, 152, 148, 160, 143}),
             new MockDataSensor(new int [] {155, 149, 147, 166, 161})
@@ -61,6 +61,7 @@ public class TestMoveBackward {
         // Assume we had already detected free 3m before this
         car.freeSpotsLength = 2;
 
+        /* Test that car position decreases and detected free spots increases */
         FreeSpots freeSpots = assertDoesNotThrow(() -> car.MoveBackward());
         assertEquals(0, freeSpots.position); // Car position should be 1
         assertEquals(3, freeSpots.freeSpotsLength); // Detected free spots should be 3
