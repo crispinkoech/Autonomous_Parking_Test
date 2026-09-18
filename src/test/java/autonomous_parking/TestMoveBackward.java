@@ -9,7 +9,7 @@ public class TestMoveBackward {
     private IDataSensor sensor1 = new MockDataSensor(new int[] {101, 100, 102, 104, 105});
     private IDataSensor sensor2 = new MockDataSensor(new int[] {103, 100, 101, 99, 98});
 
-    @Test
+    @Test // TC-MB-4
     void MoveBackwardRejectsInvalidPosition() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         car.currCarPosition = 0;
@@ -24,7 +24,7 @@ public class TestMoveBackward {
         assertEquals(exception.getMessage(), "Invalid car position");
     }
 
-    @Test
+    @Test // TC-MB-3
     void MoveBackwardRejectsInvalidParkingState() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         car.currCarPosition = 1;
@@ -35,7 +35,7 @@ public class TestMoveBackward {
         assertEquals(exception.getMessage(), "Car is already parked");
     }
 
-    @Test
+    @Test // TC-MB-2
     void MoveBackwardDecrementsPositionByOneAndResetFreeSpotsLength() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         car.currCarPosition = 1;
@@ -49,7 +49,7 @@ public class TestMoveBackward {
         assertEquals(0, freeSpots.freeSpotsLength); // Detected free spots should be reset.
     }
 
-    @Test
+    @Test // TC-MB-1
     void MoveBackwardDecrementsPositionAndIncrementsFreeSpotsByOne() {
         // Use a mock sensor that will report the right side to be free
         AutonomousParking car = new AutonomousParking(

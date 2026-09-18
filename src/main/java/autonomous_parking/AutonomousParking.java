@@ -63,18 +63,18 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - 1 <= carState.position <= 500
    * - carParkingState = UNPARKED
    *
-   * Test-cases:
-   *   ___________________________________________________________
-   *  | Conditions/Actions                | R1  | R2  | R3  | R4  |
-   *  |-----------------------------------|-----|-----|-----|-----|
-   *  | c1: 0 <= position <= 499          |  T  |  T  |  T  |  F  |
-   *  | c2: carParkingState = UNPARKED    |  T  |  T  |  F  |  -  |
-   *  | c3: isEmpty() >= 150cm            |  T  |  F  |  -  |  -  |
-   *  |-----------------------------------|-----|-----|-----|-----|
-   *  | a1: wrong input/state             |  -  |  -  |  X  |  X  |
-   *  | a2: position += 1, freeSpots = 0  |  -  |  X  |  -  |  -  |
-   *  | a3: position += 1, freeSpots += 1 |  X  |  -  |  -  |  -  |
-   *  |___________________________________|_____|_____|_____|_____|
+   * Test-cases (Annotated as TC-1, 2, etc):
+   *   ___________________________________________________________________________
+   *  | Conditions/Actions                | TC-MF-1 | TC-MF-2 | TC-MF-3 | TC-MF-4 |
+   *  |-----------------------------------|---------|---------|---------|---------|
+   *  | c1: 0 <= position <= 499          |   True  |   True  |   True  |  False  |
+   *  | c2: carParkingState = UNPARKED    |   True  |   True  |   False |    -    |
+   *  | c3: isEmpty() >= 150cm            |   True  |   False |     -   |    -    |
+   *  |-----------------------------------|---------|---------|---------|---------|
+   *  | a1: wrong input/state             |    -    |    -    |    X    |    X    |
+   *  | a2: position += 1, freeSpots = 0  |    -    |    X    |    -    |    -    |
+   *  | a3: position += 1, freeSpots += 1 |    X    |    -    |    -    |    -    |
+   *  |___________________________________|_________|_________|_________|_________|
    *
    */
   public FreeSpots MoveForward() {
@@ -214,18 +214,18 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - 0 <= postion <= 499
    * - carParkingState = UNPARKED
    * 
-   * Test-cases:
-   *   ___________________________________________________________
-   *  | Conditions/Actions                | R1  | R2  | R3  | R4  |
-   *  |-----------------------------------|-----|-----|-----|-----|
-   *  | c1: 1 <= position <= 500          |  T  |  T  |  T  |  F  |
-   *  | c2: carParkingState = UNPARKED    |  T  |  T  |  F  |  -  |
-   *  | c3: isEmpty() >= 150cm            |  T  |  F  |  -  |  -  |
-   *  |-----------------------------------|-----|-----|-----|-----|
-   *  | a1: wrong input/state             |  -  |  -  |  X  |  X  |
-   *  | a2: position -= 1, freeSpots = 0  |  -  |  X  |  -  |  -  |
-   *  | a3: position -= 1, freeSpots += 1 |  X  |  -  |  -  |  -  |
-   *  |___________________________________|_____|_____|_____|_____|
+   * Test-cases (Annotated as TC-1, 2, etc):
+   *   ___________________________________________________________________________
+   *  | Conditions/Actions                | TC-MB-1 | TC-MB-2 | TC-MB-3 | TC-MB-4 |
+   *  |-----------------------------------|---------|---------|---------|---------|
+   *  | c1: 1 <= position <= 500          |   True  |   True  |   True  |  False  |
+   *  | c2: carParkingState = UNPARKED    |   True  |   True  |   False |    -    |
+   *  | c3: isEmpty() >= 150cm            |   True  |   False |    -    |    -    |
+   *  |-----------------------------------|---------|---------|---------|---------|
+   *  | a1: wrong input/state             |    -    |    -    |    X    |    X    |
+   *  | a2: position -= 1, freeSpots = 0  |    -    |    X    |    -    |    -    |
+   *  | a3: position -= 1, freeSpots += 1 |    X    |    -    |    -    |    -    |
+   *  |___________________________________|_________|_________|_________|_________|
   */
   public FreeSpots MoveBackward() {
     /* Check that the car position is still in range (1 to 500) */
@@ -355,25 +355,27 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - carParkingState = UNPARKED
    * - carState.position remains unchanged.
    *
-   * Test-cases:
-   *   _____________________________________________________________________________
-   *  | Conditions/Actions                                        | R1  | R2  | R3  |
-   *  |-----------------------------------------------------------|-----|-----|-----|
-   *  | c1: 1 <= position <= 500                                  |  T  |  T  |  F  |
-   *  | c1: carParkingState = PARKED                              |  T  |  F  |  -  |
-   *  |-----------------------------------------------------------|-----|-----|-----|
-   *  | a1: wrong input/state                                     |  -  |  -  |  X  |
-   *  | a2: do nothing                                            |  -  |  X  |  -  |
-   *  | a3: carParkingState = UNPARKED, car.position is the same  |  X  |  -  |  -  |
-   *  |___________________________________________________________|_____|_____|_____|
+   * Test-cases (Annotated as TC-1, 2, etc):
+   *   _________________________________________________________________________________________
+   *  | Conditions/Actions                                        | TC-UP-1 | TC-UP-2 | TC-UP-3 |
+   *  |-----------------------------------------------------------|---------|---------|---------|
+   *  | c1: 1 <= position <= 500                                  |   True  |   True  |   False |
+   *  | c1: carParkingState = PARKED                              |   True  |   False |    -    |
+   *  |-----------------------------------------------------------|---------|---------|---------|
+   *  | a1: wrong input/state                                     |    -    |    -    |    X    |
+   *  | a2: do nothing                                            |    -    |    X    |    -    |
+   *  | a3: carParkingState = UNPARKED, car.position is the same  |    X    |    -    |    -    |
+   *  |___________________________________________________________|_________|_________|_________|
    *
    */
   public void UnPark() {
+    /* Check that the car position is still in range (0 to 500) */
     CarState carState = this.WhereIs();
     if (carState.position < 1 || carState.position > 500) {
       throw new IllegalStateException("Invalid car position");
     }
 
+    /* Update the unparked status only if the car is parked */
     if (carState.CurrParkingStatus == ParkingStatus.PARKED) {
       this.currParkingStatus = ParkingStatus.UNPARKED;
     }
