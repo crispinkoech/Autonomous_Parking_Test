@@ -9,7 +9,7 @@ public class TestUnpark {
     private IDataSensor sensor1 = new MockDataSensor(new int[] {});
     private IDataSensor sensor2 = new MockDataSensor(new int[] {});
 
-    @Test
+    @Test // TC-UP-3
     void UnparkRejectsInvalidPosition() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         car.currCarPosition = 0; // Outside the parking range
@@ -24,7 +24,7 @@ public class TestUnpark {
         assertEquals(exception.getMessage(), "Invalid car position");
     }
 
-    @Test
+    @Test // TC-UP-2
     void UnparkDoesNothingWhenCarIsAlreadyUnparked() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         car.currCarPosition = 1; // Keep car within parking range
@@ -35,7 +35,7 @@ public class TestUnpark {
         assertEquals(ParkingStatus.UNPARKED, car.currParkingStatus); // Car should still be unparked
     }
 
-    @Test
+    @Test // TC-UP-1
     void UnparkChangesCarStateToUnparkedIfCarWasParked() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         car.currCarPosition = 1; // Keep car within parking range

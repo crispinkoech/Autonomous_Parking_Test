@@ -9,7 +9,7 @@ public class TestMoveForward {
     private IDataSensor sensor1 = new MockDataSensor(new int[] {101, 100, 102, 104, 105});
     private IDataSensor sensor2 = new MockDataSensor(new int[] {103, 100, 101, 99, 98});
 
-    @Test
+    @Test // TC-MF-4
     void MoveForwardRejectsInvalidPosition() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
 
@@ -24,7 +24,7 @@ public class TestMoveForward {
         assertEquals(exception.getMessage(), "Invalid car position");
     }
 
-    @Test
+    @Test // TC-MF-3
     void MoveForwardRejectsInvalidParkingState() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
 
@@ -34,7 +34,7 @@ public class TestMoveForward {
         assertEquals(exception.getMessage(), "Car is already parked");
     }
 
-    @Test
+    @Test // TC-MF-2
     void MoveForwardIncrementsPositionByOneAndResetFreeSpotsLength() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2);
         assertEquals(0, car.currCarPosition);
@@ -48,7 +48,7 @@ public class TestMoveForward {
         assertEquals(0, freeSpots.freeSpotsLength);
     }
 
-    @Test
+    @Test // TC-MF-1
     void MoveForwardIncrementsPositionAndFreeSpotsByOne() {
         // Use a mock sensor that will report the right side to be free
         AutonomousParking car = new AutonomousParking(
