@@ -136,21 +136,21 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - Boundary Values
    * - Equivalence Classes
    * - Decision Tables
-   *   _________________________________________________________________________________
-   *  | Conditions/Actions                                      | R1  | R2  | R3  | R4  |
-   *  |---------------------------------------------------------|-----|-----|-----|-----|
-   *  | c1: S1 state                                            |  V  |  V  |  I  |  I  |
-   *  | c2: S2 state                                            |  V  |  I  |  V  |  I  |
-   *  |---------------------------------------------------------|-----|-----|-----|-----|
-   *  | a1: IsEmpty() = Min(avg(S1), avg(S2))                   |  X  |  -  |  -  |  -  |
-   *  | a2: IsEmpty() = S1                                      |  -  |  X  |  -  |  -  |
-   *  | a3: IsEmpty() = S2                                      |  -  |  -  |  X  |  -  |
-   *  | a4: IsEmpty() = -1                                      |  -  |  -  |  -  |  X  |
-   *  |_________________________________________________________|_____|_____|_____|_____|
+   *   ____________________________________________________________________________________________________________
+   *  | Conditions/Actions                                      |TC_IE_01     | TC_IE_02  | TC_IE_03  | TC_IT_04  |
+   *  |---------------------------------------------------------|-------------|-----------|-----------|-----------|
+   *  | c1: S1 state                                            |  V          |  V        |  I        |  I        |
+   *  | c2: S2 state                                            |  V          |  I        |  V        |  I        |
+   *  |---------------------------------------------------------|-------------|-----------|-----------|-----------|
+   *  | a1: IsEmpty() = Min(avg(S1), avg(S2))                   |  X          |  -        |  -        |  -        |
+   *  | a2: IsEmpty() = S1                                      |  -          |  X        |  -        |  -        |
+   *  | a3: IsEmpty() = S2                                      |  -          |  -        |  X        |  -        |
+   *  | a4: IsEmpty() = -1                                      |  -          |  -        |  -        |  X        |
+   *  |_________________________________________________________|_____________|___________|___________|___________|
    *
    *  V = Valid
    *  I = Invalid
-   * - (Refer to the Test_Specification.xlsm for more details)
+   * - (Refer to the Test_Specification.xlsm OR the report for more details)
    */
 
   public int IsEmpty() {
@@ -297,17 +297,17 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * Test-cases:
    * Decision Table for Park()
    *
-   *   __________________________________________________________________________
-   *  | Conditions/Actions                                      | R1  | R2  | R3 |
-   *  |---------------------------------------------------------|-----|-----|----|
-   *  | c1: Already at valid parking stretch?                   |  T  |  F  | F  |
-   *  | c2: Valid stretch found ahead?                          |  -  |  T  | F  |
-   *  | c3: End of street reached?                              |  -  |  F  | T  |
-   *  |---------------------------------------------------------|-----|-----|----|
-   *  | a1: Move forward                                        |  -  |  X  | X  |
-   *  | a2: Final status = PARKED                               |  X  |  X  | -  |
-   *  | a3: Final status = UNPARKED                             |  -  |  -  | X  |
-   *  |_________________________________________________________|_____|_____|____|
+   *   __________________________________________________________________________________________
+   *  | Conditions/Actions                                      | TC_P_01  | TC_P_02  | TC_P_03 |
+   *  |---------------------------------------------------------|----------|----------|---------|
+   *  | c1: Already at valid parking stretch?                   |  T       |  F       | F       |
+   *  | c2: Valid stretch found ahead?                          |  -       |  T       | F       |
+   *  | c3: End of street reached?                              |  -       |  F       | T       |
+   *  |---------------------------------------------------------|----------|----------|---------|
+   *  | a1: Move forward                                        |  -       |  X       | X       |
+   *  | a2: Final status = PARKED                               |  X       |  X       | -       |
+   *  | a3: Final status = UNPARKED                             |  -       |  -       | X       |
+   *  |_________________________________________________________|__________|__________|_________|
    * 
    * - (Refer to the Test_Specification.xlsm for more details)
    */
