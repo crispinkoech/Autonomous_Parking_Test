@@ -13,4 +13,12 @@ public class CarState {
         this.position = position;
         this.CurrParkingStatus = parkingStatus;
     }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public ParkingStatus getParkingStatus() {
+        return CurrParkingStatus;
+    }
 }

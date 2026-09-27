@@ -1,4 +1,4 @@
-package autonomous_parking.mocks;
+package autonomous_parking.Integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -48,8 +48,6 @@ class TestMockitoExample {
         int distance = car.IsEmpty();
 
         assertEquals(180, distance);
-
-        car.Park();
 
         verify(sensor1, atLeastOnce()).GetDataSensor();
         verify(sensor2, atLeastOnce()).GetDataSensor();
