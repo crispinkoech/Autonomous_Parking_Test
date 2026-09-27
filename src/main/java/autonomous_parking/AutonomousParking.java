@@ -37,6 +37,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *    to the right of the car in the new position.
    *  - If there is free space to the right, freeSpotsLength is incremented by 1;
    *    otherwise, it is reset to zero.
+   *  - Checks/Updates the most efficient free spots via`checkForMostEfficientFreeSpot` method.
    *
    * Inputs:
    * - Queries for the car's current position
@@ -44,10 +45,6 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *
    * Outputs:
    * - Returns the parkingState (position and freeSpots)
-   *
-   * Assumptions:
-   * - This method is called by the `Park()` method only when the detected
-   *   freeSpots are not enough to park the car (< 5m).
    *
    * Pre-condition:
    * - 0 <= carState.position <= 499
@@ -58,24 +55,27 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - carParkingState = UNPARKED
    *
    * Test-cases (Annotated as TC-1, 2, etc):
-   *   ___________________________________________________________________________
-   *  | Conditions/Actions                | TC-MF-1 | TC-MF-2 | TC-MF-3 | TC-MF-4 |
-   *  |-----------------------------------|---------|---------|---------|---------|
-   *  | c1: 0 <= position <= 499          |   True  |   True  |   True  |  False  |
-   *  | c2: carParkingState = UNPARKED    |   True  |   True  |   False |    -    |
-   *  | c3: isEmpty() >= 150cm            |   True  |   False |     -   |    -    |
-   *  |-----------------------------------|---------|---------|---------|---------|
-   *  | a1: wrong input/state             |    -    |    -    |    X    |    X    |
-   *  | a2: position += 1, freeSpots = 0  |    -    |    X    |    -    |    -    |
-   *  | a3: position += 1, freeSpots += 1 |    X    |    -    |    -    |    -    |
-   *  |___________________________________|_________|_________|_________|_________|
+   *   ________________________________________________________________________________________________________________________
+   *  | Conditions/Actions                                        | TC-MF-1 | TC-MF-2 | TC-MF-3 | TC-MF-4 | TC-MF-5 | TC-MF-6 |
+   *  |-----------------------------------------------------------|---------|---------|---------|---------|---------|---------|
+   *  | c1: 0 <= position <= 499                                  |   True  |   True  |   True  |   True  |   True  |   False |
+   *  | c2: carParkingState = UNPARKED                            |   True  |   True  |   True  |   True  |   False |    -    |
+   *  | c3: isEmpty() >= 150cm                                    |   True  |   True  |   False |   False |    -    |    -    |
+   *  | c4: position == 499                                       |   True  |   False |   True  |   False |    -    |    -    |
+   *  |-----------------------------------------------------------|---------|---------|---------|---------|---------|---------|
+   *  | a1: wrong input/state                                     |    -    |    -    |    -    |    -    |    X    |    X    |
+   *  | a2: position += 1, freeSpots = 0                          |    -    |    -    |    -    |    X    |    -    |    -    |
+   *  | a2: position += 1, checkMostEffientSpot(), freeSpots = 0  |    -    |    -    |    X    |    -    |    -    |    -    |
+   *  | a3: position += 1, freeSpots += 1                         |    -    |    X    |    -    |    -    |    -    |    -    |
+   *  | a4: position += 1, freeSpots += 1, checkMostEffientSpot() |    X    |    -    |    -    |    -    |    -    |    -    |
+   *  |___________________________________________________________|_________|_________|_________|_________|_________|_________|
    *
    */
   public FreeSpots MoveForward() {
     /* Check that the car position is still in range (0 to 499) */
     CarState carState = this.WhereIs();
     /* Get prev car position */
-    int prevCarPosition = this.actuator.GetPosition();
+    int prevCarPosition = carState.position;
 
     /* Check that the car is not parked */
     if (carState.CurrParkingStatus == ParkingStatus.PARKED) {
@@ -89,31 +89,30 @@ public class AutonomousParking implements AutonomousParkingInterface {
     int distanceToClosestObject = this.IsEmpty();
     if (distanceToClosestObject >= MIN_SENSOR_DETECTED_FREE_SPOT) {
       freeSpotsLength += 1;
-    } else { /* Encounter blocking point on the right hand side */
-      /* Check and register the most Efficient parking spot */
-      if (freeSpotsLength >= PARKING_SPOT_LENGTH)
-      {
-        if ((currMostEfficientFreeSpot.freeSpotsLength == 0) || 
-            (currMostEfficientFreeSpot.freeSpotsLength > freeSpotsLength))
-        {
-          /* Registering the current most efficient parking spot */
-          currMostEfficientFreeSpot = new FreeSpots(prevCarPosition, freeSpotsLength);
-        }
+      /* Check if the current space is the most efficient if you've reached the end of the road */
+      int currentCarPosition = this.actuator.GetPosition();
+      if (currentCarPosition == ROAD_MAX_STRETCH) {
+          checkForMostEfficientFreeSpot(currentCarPosition);
       }
-      /* Resetting the freeSpotsLength due to obstruction */
+    } else {
+      /* Encounter blocking point on the right hand side */
+      checkForMostEfficientFreeSpot(prevCarPosition);
       freeSpotsLength = 0;
     }
 
-    /* Update for several last freeSpotsLength before reaching the end of road without encountering any obstruction */
-    if ((this.actuator.GetPosition() == ROAD_MAX_STRETCH) && 
-        (freeSpotsLength >= PARKING_SPOT_LENGTH) &&
-        ((freeSpotsLength < currMostEfficientFreeSpot.freeSpotsLength) ||
-        (currMostEfficientFreeSpot.freeSpotsLength == 0))) {
-          
-        currMostEfficientFreeSpot = new FreeSpots(this.actuator.GetPosition(), freeSpotsLength); // Update currMostEfficientFreeSpot
+    return new FreeSpots(this.actuator.GetPosition(), freeSpotsLength);
+  }
+
+  void checkForMostEfficientFreeSpot(int position) {
+    if (freeSpotsLength < PARKING_SPOT_LENGTH) {
+      return;
     }
 
-    return new FreeSpots(this.actuator.GetPosition(), freeSpotsLength);
+    /* Check and register the most efficient parking spot */
+    int currentBestLength = currMostEfficientFreeSpot.freeSpotsLength;
+    if (currentBestLength == 0 || freeSpotsLength < currentBestLength) {
+      currMostEfficientFreeSpot = new FreeSpots(position, freeSpotsLength);
+    }
   }
 
   /**
@@ -470,10 +469,11 @@ public class AutonomousParking implements AutonomousParkingInterface {
  * ---------------------------------------------------------|
 */
   public CarState WhereIs() {
-    if (this.actuator.GetPosition() < 0 || this.actuator.GetPosition() > 500){
+    int position = this.actuator.GetPosition();
+    if (position < 0 || position > 500){
       throw new IllegalStateException("Invalid car position");
     }
-    return new CarState(this.actuator.GetPosition() , currParkingStatus);
+    return new CarState(position , currParkingStatus);
 
   }
 }
