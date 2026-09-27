@@ -18,7 +18,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
   private IActuator actuator;
 
   /* Parking Status */
-  private FreeSpots currMostEfficientFreeSpot = new FreeSpots(0, 0);
+  FreeSpots currMostEfficientFreeSpot = new FreeSpots(0, 0);
 
   /* Set sensors and initial car/parking state */
   public AutonomousParking(IDataSensor sensor1, IDataSensor sensor2, IActuator actuator) {
@@ -37,7 +37,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *    to the right of the car in the new position.
    *  - If there is free space to the right, freeSpotsLength is incremented by 1;
    *    otherwise, it is reset to zero.
-   *  - Checks/Updates the most efficient free spots via`checkForMostEfficientFreeSpot` method.
+   *  - Checks/Updates the most efficient free spots via`CheckForMostEfficientFreeSpot` method.
    *
    * Inputs:
    * - Queries for the car's current position
@@ -92,18 +92,49 @@ public class AutonomousParking implements AutonomousParkingInterface {
       /* Check if the current space is the most efficient if you've reached the end of the road */
       int currentCarPosition = this.actuator.GetPosition();
       if (currentCarPosition == ROAD_MAX_STRETCH) {
-          checkForMostEfficientFreeSpot(currentCarPosition);
+          this.CheckForMostEfficientFreeSpot(currentCarPosition);
       }
     } else {
       /* Encounter blocking point on the right hand side */
-      checkForMostEfficientFreeSpot(prevCarPosition);
+      this.CheckForMostEfficientFreeSpot(prevCarPosition);
       freeSpotsLength = 0;
     }
 
     return new FreeSpots(this.actuator.GetPosition(), freeSpotsLength);
   }
 
-  void checkForMostEfficientFreeSpot(int position) {
+    /**
+   * Description:
+   *  - Updates the internal state for the most efficient parking spot, if any
+   *
+   * Inputs:
+   *  - Position of the car
+   *  - The number of free/empty 1m spots backwards from the provided position
+   *  - Current/Previous most efficient parking spot
+   *
+   * Outputs:
+   * - Updates the current most efficient parking spot.
+   *
+   * Pre-condition:
+   *  - Current most efficient parking spot's length is either zero, or >= 5m.
+   *
+   * Post-condition:
+   *  - Updated most efficient parking spot's length is either zero, or >= 5m.
+   *
+   * Test-cases (Annotated as TC-1, 2, etc):
+   *   ____________________________________________________________________________________________________
+   *  | Conditions/Actions                                        | TC-CF-1 | TC-CF-2 | TC-CF-3 | TC-CF-4 |
+   *  |-----------------------------------------------------------|---------|---------|---------|---------|
+   *  | c2: freeSpotsLen >= 5m                                    |   True  |   True  |   True  |   False |
+   *  | c3: currMostEfficientSpot.length                          |   >=5m  |   >=5m  |    0    |    -    |
+   *  | c4: freeSpotsLen < currMostEfficientSpot.freeSpotsLen     |   True  |   False |    -    |    -    |
+   *  |-----------------------------------------------------------|---------|---------|---------|---------|
+   *  | a1: do nothing                                            |    -    |    X    |    -    |    X    |
+   *  | a3: currMostEfficientSpot = (position, freeSpotsLen)      |    X    |    -    |    X    |    -    |
+   *  |___________________________________________________________|_________|_________|_________|_________|
+   *
+   */
+  void CheckForMostEfficientFreeSpot(int position) {
     if (freeSpotsLength < PARKING_SPOT_LENGTH) {
       return;
     }
