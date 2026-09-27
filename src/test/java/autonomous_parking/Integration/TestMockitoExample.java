@@ -1,4 +1,4 @@
-package autonomous_parking.mocks;
+package autonomous_parking.Integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
