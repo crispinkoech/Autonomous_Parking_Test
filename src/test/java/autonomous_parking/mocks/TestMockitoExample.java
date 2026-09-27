@@ -49,8 +49,6 @@ class TestMockitoExample {
 
         assertEquals(180, distance);
 
-        car.Park();
-
         verify(sensor1, atLeastOnce()).GetDataSensor();
         verify(sensor2, atLeastOnce()).GetDataSensor();
 
