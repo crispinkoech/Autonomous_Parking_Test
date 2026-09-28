@@ -74,9 +74,9 @@ public class TestMoveForward {
     void MoveForwardTestCase2() {
         /* Use a mock sensor that will report the right side to be free */
         IDataSensor sensor = mock(IDataSensor.class);
-        when(sensor.FilterNoise(any())).thenReturn(true);
-        when(sensor.IsDataInRange(any())).thenReturn(true);
-        when(sensor.CalculateData(any())).thenReturn(155);
+        when(sensor.FilterNoise()).thenReturn(true);
+        when(sensor.IsDataInRange()).thenReturn(true);
+        when(sensor.CalculateData()).thenReturn(155);
 
         IActuator actuator = mock(IActuator.class);
         when(actuator.GetPosition()).thenReturn(0, 1);
@@ -95,9 +95,9 @@ public class TestMoveForward {
     void MoveForwardTestCase1() {
         /* Use a mock sensor that will report the right side to be free */
         IDataSensor sensor = mock(IDataSensor.class);
-        when(sensor.FilterNoise(any())).thenReturn(true);
-        when(sensor.IsDataInRange(any())).thenReturn(true);
-        when(sensor.CalculateData(any())).thenReturn(155);
+        when(sensor.FilterNoise()).thenReturn(true);
+        when(sensor.IsDataInRange()).thenReturn(true);
+        when(sensor.CalculateData()).thenReturn(155);
 
         /* Test moving to the end of the street */
         IActuator actuator = mock(IActuator.class);

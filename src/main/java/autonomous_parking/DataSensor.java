@@ -12,31 +12,29 @@ public class DataSensor implements IDataSensor {
         this.sensorData = new int[] {-1, -1, -1, -1, -1};
     }
 
-    public void Read() {
-         // Used for testing purposes;
-         this.sensorData = new int[] {101, 100, 102, 104, 105};
+    public void Read(int[] sensorData) {
+        this.sensorData = sensorData;
     }
 
     public int[] GetDataSensor() {
-        Read();
         return this.sensorData;
     }
 
-    public boolean IsDataInRange(int[] sensorData) {
-        for (int i = 0; i < sensorData.length; i++) {
-            if (sensorData[i] < SENSOR_MIN_VALUE || sensorData[i] > SENSOR_MAX_VALUE) {
+    public boolean IsDataInRange() {
+        for (int i = 0; i < this.sensorData.length; i++) {
+            if (this.sensorData[i] < SENSOR_MIN_VALUE || this.sensorData[i] > SENSOR_MAX_VALUE) {
                 return false;
             }
         }
         return true;
     }
 
-    public boolean FilterNoise(int[] sensorData) {
+    public boolean FilterNoise() {
         // Implementation for filtering noise from sensor data
-        int maxValData = sensorData[0];
-        int minValData = sensorData[0];
+        int maxValData = this.sensorData[0];
+        int minValData = this.sensorData[0];
 
-        for (int n : sensorData) {
+        for (int n : this.sensorData) {
             if (n > maxValData) {
                 maxValData = n;
             }
@@ -52,15 +50,15 @@ public class DataSensor implements IDataSensor {
         return true;
     }
 
-    public int CalculateData(int[] sensorData) {
+    public int CalculateData() {
 
         int sum = 0;
 
-        for (int i = 0; i < sensorData.length; i++) {
-            sum += sensorData[i];
+        for (int i = 0; i < this.sensorData.length; i++) {
+            sum += this.sensorData[i];
         }
 
-        return (int)(sum/sensorData.length);
+        return (int)(sum/this.sensorData.length);
     }
 
 }
