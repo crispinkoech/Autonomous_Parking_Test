@@ -74,6 +74,9 @@ public class AutonomousParking implements AutonomousParkingInterface {
   public FreeSpots MoveForward() {
     /* Check that the car position is still in range (0 to 499) */
     CarState carState = this.WhereIs();
+    if (carState.position == ROAD_MAX_STRETCH) {
+      throw new IllegalStateException("Invalid car position");
+    }
     /* Get prev car position */
     int prevCarPosition = carState.position;
 
