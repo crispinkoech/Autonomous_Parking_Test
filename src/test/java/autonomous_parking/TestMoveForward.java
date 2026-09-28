@@ -21,12 +21,12 @@ public class TestMoveForward {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2, actuator);
 
         /* Test for the car's position being below the required range */
-        when(actuator.GetPosition()).thenReturn(-10);
+        when(actuator.GetPosition()).thenReturn(-1);
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> car.MoveForward());
         assertEquals(exception.getMessage(), "Invalid car position");
 
         /* Test for the car's position being beyond the required range */
-        when(actuator.GetPosition()).thenReturn(501);
+        when(actuator.GetPosition()).thenReturn(500);
         exception = assertThrows(IllegalStateException.class, () -> car.MoveForward());
         assertEquals(exception.getMessage(), "Invalid car position");
     }
@@ -67,7 +67,7 @@ public class TestMoveForward {
         assertEquals(500, freeSpots.position);
         assertEquals(0, freeSpots.freeSpotsLength);
         /* Test that we checked for efficient spots at the last position */
-        verify(car).checkForMostEfficientFreeSpot(499);
+        verify(car).CheckForMostEfficientFreeSpot(499);
     }
 
     @Test // TC-MF-2
@@ -113,6 +113,6 @@ public class TestMoveForward {
         assertEquals(500, freeSpots.position);
         assertEquals(3, freeSpots.freeSpotsLength);
         /* Test that we checked for efficient spots at the last position */
-        verify(car).checkForMostEfficientFreeSpot(500);
+        verify(car).CheckForMostEfficientFreeSpot(500);
     }
 }
