@@ -222,24 +222,22 @@ public class AutonomousParking implements AutonomousParkingInterface {
     int filteredDataSensor1 = -1;
     int filteredDataSensor2 = -1;
     int filteredData = -1;
-    int[] s1Data = new int[] {-1, -1, -1, -1, -1};
-    int[] s2Data = new int[] {-1, -1, -1, -1, -1};
 
     /* Read data from sensors */
-    s1Data = sensor1.GetDataSensor();
-    s2Data = sensor2.GetDataSensor();
+    sensor1.GetDataSensor();
+    sensor2.GetDataSensor();
 
     /* Filter noise and check if sensor data is in range */
-    boolean isSensor1Valid = sensor1.FilterNoise(s1Data) && sensor1.IsDataInRange(s1Data);
-    boolean isSensor2Valid = sensor2.FilterNoise(s2Data) && sensor2.IsDataInRange(s2Data);
+    boolean isSensor1Valid = sensor1.FilterNoise() && sensor1.IsDataInRange();
+    boolean isSensor2Valid = sensor2.FilterNoise() && sensor2.IsDataInRange();
 
     /* Calculate filtered data from valid sensors */
     if (isSensor1Valid) {
-        filteredDataSensor1 = sensor1.CalculateData(s1Data);
+        filteredDataSensor1 = sensor1.CalculateData();
     }
 
     if (isSensor2Valid) {
-        filteredDataSensor2 = sensor2.CalculateData(s2Data);
+        filteredDataSensor2 = sensor2.CalculateData();
     }
 
     /* Determine the final filtered data based on valid sensor readings */

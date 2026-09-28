@@ -65,19 +65,19 @@ class TestSuccessfulPark {
 
 
 
-        when(sensor.CalculateData(any(int[].class)))
+        when(sensor.CalculateData())
             .thenAnswer(invocation -> {
                 int[] data = invocation.getArgument(0);
                 return Arrays.stream(data).sum() / data.length;
             });
 
-        when(sensor.FilterNoise(any(int[].class)))
+        when(sensor.FilterNoise())
             .thenAnswer(invocation -> {
                 int [] data = invocation.getArgument(0);
                 return !Arrays.equals(data, NOISE);
             });
 
-        when(sensor.IsDataInRange(any(int[].class)))
+        when(sensor.IsDataInRange())
             .thenAnswer(invocation -> {
                 int[] data = invocation.getArgument(0);
                 return !Arrays.equals(data, NOISE);

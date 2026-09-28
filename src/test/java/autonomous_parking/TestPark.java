@@ -14,15 +14,20 @@ class MockDataSensorIsEmpty extends DataSensor {
         this.sensorDataSets = sensorDataSets;
     }
 
-    @Override public void Read() {
-        sensorData = new int[] {-1, -1, -1, -1, -1};
+    @Override public void Read(int[] sensorData) 
+    {
+        this.sensorData = new int[] {-1, -1, -1, -1, -1};
         if (testCount < sensorDataSets.length)
         {
-            sensorData = sensorDataSets[testCount];
+            this.sensorData = this.sensorDataSets[testCount];
             testCount++;
         }
     }
-
+    
+    @Override public int[] GetDataSensor() {
+        this.Read(sensorData);
+        return this.sensorData;
+    }
 }
 
 public class TestPark {
