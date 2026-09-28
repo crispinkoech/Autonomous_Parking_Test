@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TestMoveForward.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">java (Sep 28, 2026 10:56:02 PM)</a> &gt; <a href="../../index.html" class="el_group">JUnit</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">autonomous_parking</a> &gt; <span class="el_source">TestMoveForward.java</span></div><h1>TestMoveForward.java</h1><pre class="source lang-java linenums">package autonomous_parking;
+
+import org.junit.jupiter.api.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+<span class="fc" id="L8">public class TestMoveForward {</span>
+<span class="fc" id="L9">    private static IDataSensor sensor1 = mock(IDataSensor.class);</span>
+<span class="fc" id="L10">    private static IDataSensor sensor2 = mock(IDataSensor.class);</span>
+
+    @BeforeAll 
+    static void beforeAll() {
+<span class="fc" id="L14">        when(sensor1.GetDataSensor()).thenReturn(new int[] {101, 100, 102, 104, 105});</span>
+<span class="fc" id="L15">        when(sensor2.GetDataSensor()).thenReturn(new int[] {103, 100, 101, 99, 98});</span>
+<span class="fc" id="L16">    }</span>
+
+    @Test // TC-MF-6
+    void MoveForwardTestCase6() {
+<span class="fc" id="L20">        IActuator actuator = mock(IActuator.class);</span>
+<span class="fc" id="L21">        AutonomousParking car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+
+        /* Test for the car's position being below the required range */
+<span class="fc" id="L24">        when(actuator.GetPosition()).thenReturn(-1);</span>
+<span class="pc" id="L25">        IllegalStateException exception = assertThrows(IllegalStateException.class, () -&gt; car.MoveForward());</span>
+<span class="fc" id="L26">        assertEquals(exception.getMessage(), &quot;Invalid car position&quot;);</span>
+
+        /* Test for the car's position being beyond the required range */
+<span class="fc" id="L29">        when(actuator.GetPosition()).thenReturn(500);</span>
+<span class="pc" id="L30">        exception = assertThrows(IllegalStateException.class, () -&gt; car.MoveForward());</span>
+<span class="fc" id="L31">        assertEquals(exception.getMessage(), &quot;Invalid car position&quot;);</span>
+<span class="fc" id="L32">    }</span>
+
+    @Test // TC-MF-5
+    void MoveForwardTestCase5() {
+<span class="fc" id="L36">        AutonomousParking car = new AutonomousParking(sensor1, sensor2, mock(IActuator.class));</span>
+
+        /* Test for the car being in a unwanted parked state */
+<span class="fc" id="L39">        car.currParkingStatus = ParkingStatus.PARKED;</span>
+<span class="pc" id="L40">        IllegalStateException exception = assertThrows(IllegalStateException.class, () -&gt; car.MoveForward());</span>
+<span class="fc" id="L41">        assertEquals(exception.getMessage(), &quot;Car is already parked&quot;);</span>
+<span class="fc" id="L42">    }</span>
+
+    @Test // TC-MF-4
+    void MoveForwardTestCase4() {
+<span class="fc" id="L46">        AutonomousParking car = new AutonomousParking(sensor1, sensor2, new Actuator());</span>
+
+        // Assume we had already detected free 2m before this
+<span class="fc" id="L49">        car.freeSpotsLength = 2;</span>
+
+        /* Test that car position increases and detected free spots resets */
+<span class="fc" id="L52">        FreeSpots freeSpots = assertDoesNotThrow(() -&gt; car.MoveForward());</span>
+<span class="fc" id="L53">        assertEquals(1, freeSpots.position);</span>
+<span class="fc" id="L54">        assertEquals(0, freeSpots.freeSpotsLength);</span>
+<span class="fc" id="L55">    }</span>
+
+    @Test // TC-MF-3
+    void MoveForwardTestCase3() {
+        /* Test moving to the end of the street */
+<span class="fc" id="L60">        IActuator actuator = mock(IActuator.class);</span>
+<span class="fc" id="L61">        when(actuator.GetPosition()).thenReturn(499, 500);</span>
+
+<span class="fc" id="L63">        AutonomousParking car = spy(new AutonomousParking(sensor1, sensor2, actuator));</span>
+
+        /* Test that car position increases and detected free spots resets*/
+<span class="fc" id="L66">        FreeSpots freeSpots = assertDoesNotThrow(() -&gt; car.MoveForward());</span>
+<span class="fc" id="L67">        assertEquals(500, freeSpots.position);</span>
+<span class="fc" id="L68">        assertEquals(0, freeSpots.freeSpotsLength);</span>
+        /* Test that we checked for efficient spots at the last position */
+<span class="fc" id="L70">        verify(car).CheckForMostEfficientFreeSpot(499);</span>
+<span class="fc" id="L71">    }</span>
+
+    @Test // TC-MF-2
+    void MoveForwardTestCase2() {
+        /* Use a mock sensor that will report the right side to be free */
+<span class="fc" id="L76">        IDataSensor sensor = mock(IDataSensor.class);</span>
+<span class="fc" id="L77">        when(sensor.FilterNoise()).thenReturn(true);</span>
+<span class="fc" id="L78">        when(sensor.IsDataInRange()).thenReturn(true);</span>
+<span class="fc" id="L79">        when(sensor.CalculateData()).thenReturn(155);</span>
+
+<span class="fc" id="L81">        IActuator actuator = mock(IActuator.class);</span>
+<span class="fc" id="L82">        when(actuator.GetPosition()).thenReturn(0, 1);</span>
+<span class="fc" id="L83">        AutonomousParking car = new AutonomousParking(sensor, sensor, actuator);</span>
+
+        // Assume we had already detected free 2m before this
+<span class="fc" id="L86">        car.freeSpotsLength = 2;</span>
+
+        /* Test that car position increases and detected free spots increases */
+<span class="fc" id="L89">        FreeSpots freeSpots = assertDoesNotThrow(() -&gt; car.MoveForward());</span>
+<span class="fc" id="L90">        assertEquals(1, freeSpots.position);</span>
+<span class="fc" id="L91">        assertEquals(3, freeSpots.freeSpotsLength);</span>
+<span class="fc" id="L92">    }</span>
+
+    @Test // TC-MF-1
+    void MoveForwardTestCase1() {
+        /* Use a mock sensor that will report the right side to be free */
+<span class="fc" id="L97">        IDataSensor sensor = mock(IDataSensor.class);</span>
+<span class="fc" id="L98">        when(sensor.FilterNoise()).thenReturn(true);</span>
+<span class="fc" id="L99">        when(sensor.IsDataInRange()).thenReturn(true);</span>
+<span class="fc" id="L100">        when(sensor.CalculateData()).thenReturn(155);</span>
+
+        /* Test moving to the end of the street */
+<span class="fc" id="L103">        IActuator actuator = mock(IActuator.class);</span>
+<span class="fc" id="L104">        when(actuator.GetPosition()).thenReturn(499, 500);</span>
+
+<span class="fc" id="L106">        AutonomousParking car = spy(new AutonomousParking(sensor, sensor, actuator));</span>
+
+        // Assume we had already detected free 2m before this
+<span class="fc" id="L109">        car.freeSpotsLength = 2;</span>
+
+        /* Test that car position increases and detected free spots increases */
+<span class="fc" id="L112">        FreeSpots freeSpots = assertDoesNotThrow(() -&gt; car.MoveForward());</span>
+<span class="fc" id="L113">        assertEquals(500, freeSpots.position);</span>
+<span class="fc" id="L114">        assertEquals(3, freeSpots.freeSpotsLength);</span>
+        /* Test that we checked for efficient spots at the last position */
+<span class="fc" id="L116">        verify(car).CheckForMostEfficientFreeSpot(500);</span>
+<span class="fc" id="L117">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span>java (Sep 28, 2026 10:56:02 PM)</div></body></html>

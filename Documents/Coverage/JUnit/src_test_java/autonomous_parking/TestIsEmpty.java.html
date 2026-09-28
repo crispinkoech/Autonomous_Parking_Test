@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TestIsEmpty.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">java (Sep 28, 2026 10:56:02 PM)</a> &gt; <a href="../../index.html" class="el_group">JUnit</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">autonomous_parking</a> &gt; <span class="el_source">TestIsEmpty.java</span></div><h1>TestIsEmpty.java</h1><pre class="source lang-java linenums">package autonomous_parking;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+<span class="fc" id="L7">public class TestIsEmpty {</span>
+    class MockDataSensorIsEmpty extends DataSensor {
+
+<span class="fc" id="L10">        int testCount = 0;</span>
+        int[][] sensorDataSets;
+    
+<span class="fc" id="L13">        public MockDataSensorIsEmpty(int[][] sensorDataSets)</span>
+<span class="fc" id="L14">        {</span>
+<span class="fc" id="L15">            this.sensorData = sensorDataSets[0];</span>
+<span class="fc" id="L16">            this.sensorDataSets = sensorDataSets;</span>
+<span class="fc" id="L17">        }</span>
+    
+        @Override public void Read(int[] sensorData) 
+        {
+<span class="fc" id="L21">            this.sensorData = new int[] {-1, -1, -1, -1, -1};</span>
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">            if (testCount &lt; sensorDataSets.length)</span>
+            {
+<span class="fc" id="L24">                this.sensorData = this.sensorDataSets[testCount];</span>
+<span class="fc" id="L25">                testCount++;</span>
+            }
+<span class="fc" id="L27">        }</span>
+        
+        @Override public int[] GetDataSensor() {
+<span class="fc" id="L30">            this.Read(sensorData);</span>
+<span class="fc" id="L31">            return this.sensorData;</span>
+        }
+    }
+
+    @Test // TC_IE_01
+    void TestBothNormalSensorData() {
+<span class="fc" id="L37">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L38">                            {101, 100, 102, 104, 105},                         </span>
+                            };
+<span class="fc" id="L40">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L41">                            {10, 20, 30, 40, 50},</span>
+                            };
+<span class="fc" id="L43">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L44">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L45">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L46">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L47">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L49">        assertEquals(30, filteredSensorData);</span>
+
+<span class="fc" id="L51">    }</span>
+    @Test // TC_IE_02
+    void TestAbnormalSensorData1() {
+<span class="fc" id="L54">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L55">                            {10, 100, 25, 44, 88},                    </span>
+                            };
+<span class="fc" id="L57">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L58">                            {101, 100, 102, 104, 105},</span>
+                            };
+<span class="fc" id="L60">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L61">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L62">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L63">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L64">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L66">        assertEquals(102, filteredSensorData);</span>
+
+<span class="fc" id="L68">    }</span>
+    @Test // TC_IE_03
+    void TestAbnormalSensorData2() {
+<span class="fc" id="L71">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L72">                            {150, 120, 155, 145, 160},                    </span>
+                            };
+<span class="fc" id="L74">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L75">                            {10, 100, 25, 44, 88},</span>
+                            };
+<span class="fc" id="L77">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L78">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L79">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L80">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L81">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L83">        assertEquals(146, filteredSensorData);</span>
+
+<span class="fc" id="L85">    }</span>
+
+    @Test // TC_IE_04
+    void TestAbnormalBothSensorData() {
+<span class="fc" id="L89">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L90">                            {111, 22, 35, 12, 180},                    </span>
+                            };
+<span class="fc" id="L92">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L93">                            {10, 100, 25, 44, 88},</span>
+                            };
+<span class="fc" id="L95">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L96">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L97">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L98">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L99">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L101">        assertEquals(-1, filteredSensorData);</span>
+
+<span class="fc" id="L103">    }</span>
+    @Test // TC_IE_05
+    void TestNormalBDBothSensorData1() {
+<span class="fc" id="L106">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L107">                            {0, 1, 0, 1, 0},                    </span>
+                            };
+<span class="fc" id="L109">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L110">                            {1, 0, 1, 0, 1},</span>
+                            };
+<span class="fc" id="L112">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L113">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L114">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L115">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L116">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L118">        assertEquals(0, filteredSensorData);</span>
+
+<span class="fc" id="L120">    }</span>
+    @Test // TC_IE_06
+    void TestNormalBDBothSensorData2() {
+<span class="fc" id="L123">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L124">                            {200, 200, 200, 200, 200},                    </span>
+                            };
+<span class="fc" id="L126">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L127">                            {200, 200, 200, 200, 200},</span>
+                            };
+<span class="fc" id="L129">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L130">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L131">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L132">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L133">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L135">        assertEquals(200, filteredSensorData);</span>
+
+<span class="fc" id="L137">    }</span>
+    @Test // TC_IE_07
+    void TestAbnormalBDBothSensorData1() {
+<span class="fc" id="L140">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L141">                            {-1, -2, -3, -1, 0},                    </span>
+                            };
+<span class="fc" id="L143">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L144">                            {-1, -2, -3, -1, 0},</span>
+                            };
+<span class="fc" id="L146">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L147">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L148">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L149">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L150">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L152">        assertEquals(-1, filteredSensorData);</span>
+
+<span class="fc" id="L154">    }</span>
+    @Test // TC_IE_08
+    void TestAbnormalBDBothSensorData2() {
+<span class="fc" id="L157">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L158">                            {201, 200, 230, 212, 211},                    </span>
+                            };
+<span class="fc" id="L160">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L161">                            {198, 215, 220, 215, 199},</span>
+                            };
+<span class="fc" id="L163">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L164">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L165">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L166">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L167">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L169">        assertEquals(-1, filteredSensorData);</span>
+
+<span class="fc" id="L171">    }</span>
+
+    @Test // TC_IE_09
+    void TestNormalBDBothSensorDataNoiseLess() {
+<span class="fc" id="L175">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L176">                            {97, 99, 120, 99, 111},                    </span>
+                            };
+<span class="fc" id="L178">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L179">                            {100, 170, 150, 165, 177},</span>
+                            };
+<span class="fc" id="L181">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L182">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L183">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L184">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L185">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L187">        assertEquals(105, filteredSensorData);</span>
+
+<span class="fc" id="L189">    }</span>
+    @Test // TC_IE_10
+    void TestNormalBDBothSensorDataNoiseEqual() {
+<span class="fc" id="L192">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L193">                            {97, 99, 120, 99, 111},                    </span>
+                            };
+<span class="fc" id="L195">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L196">                            {180, 170, 150, 165, 100},</span>
+                            };
+<span class="fc" id="L198">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L199">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L200">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L201">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L202">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L204">        assertEquals(105, filteredSensorData);</span>
+
+<span class="fc" id="L206">    }</span>
+    @Test // TC_IE_10
+    void TestAbnormalBDBothSensorDataNoise() {
+<span class="fc" id="L209">        int[][] sensorData1Sets = {</span>
+<span class="fc" id="L210">                            {97, 99, 177, 60, 111},                    </span>
+                            };
+<span class="fc" id="L212">        int[][] sensorData2Sets = {</span>
+<span class="fc" id="L213">                            {180, 170, 150, 165, 90},</span>
+                            };
+<span class="fc" id="L215">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="fc" id="L216">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="fc" id="L217">        IActuator actuator = new Actuator();</span>
+<span class="fc" id="L218">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L219">        int filteredSensorData = Car.IsEmpty();</span>
+
+<span class="fc" id="L221">        assertEquals(-1, filteredSensorData);</span>
+
+<span class="fc" id="L223">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span>java (Sep 28, 2026 10:56:02 PM)</div></body></html>

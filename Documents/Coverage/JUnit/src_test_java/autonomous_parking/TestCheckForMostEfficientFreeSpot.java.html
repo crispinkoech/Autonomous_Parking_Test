@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TestCheckForMostEfficientFreeSpot.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">java (Sep 28, 2026 10:56:02 PM)</a> &gt; <a href="../../index.html" class="el_group">JUnit</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">autonomous_parking</a> &gt; <span class="el_source">TestCheckForMostEfficientFreeSpot.java</span></div><h1>TestCheckForMostEfficientFreeSpot.java</h1><pre class="source lang-java linenums">package autonomous_parking;
+
+import org.junit.jupiter.api.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+<span class="fc" id="L8">public class TestCheckForMostEfficientFreeSpot {</span>
+<span class="fc" id="L9">  private static IDataSensor sensor1 = mock(IDataSensor.class);</span>
+<span class="fc" id="L10">  private static IDataSensor sensor2 = mock(IDataSensor.class);</span>
+
+  @Test // TC-CF-4
+  void CheckForMostEfficientFreeSpot_TestCase4() {
+<span class="fc" id="L14">    AutonomousParking car = new AutonomousParking(sensor1, sensor2, mock(IActuator.class));</span>
+<span class="fc" id="L15">    assertEquals(0, car.currMostEfficientFreeSpot.freeSpotsLength);</span>
+
+    // Checking for free spot does nothing
+<span class="fc" id="L18">    car.CheckForMostEfficientFreeSpot(0);</span>
+<span class="fc" id="L19">    assertEquals(0, car.currMostEfficientFreeSpot.freeSpotsLength);</span>
+<span class="fc" id="L20">  }</span>
+
+  @Test // TC-CF-3
+  void CheckForMostEfficientFreeSpot_TestCase3() {
+<span class="fc" id="L24">    AutonomousParking car = new AutonomousParking(sensor1, sensor2, mock(IActuator.class));</span>
+<span class="fc" id="L25">    assertEquals(0, car.currMostEfficientFreeSpot.freeSpotsLength);</span>
+
+    // Suppose we have now tracked 5m free backwards, from pos 10
+<span class="fc" id="L28">    car.freeSpotsLength = 5;</span>
+<span class="fc" id="L29">    car.CheckForMostEfficientFreeSpot(10);</span>
+
+    // Assert that most effiction spot has been updated.
+<span class="fc" id="L32">    assertEquals(10, car.currMostEfficientFreeSpot.position);</span>
+<span class="fc" id="L33">    assertEquals(5, car.currMostEfficientFreeSpot.freeSpotsLength);</span>
+<span class="fc" id="L34">  }</span>
+
+  @Test // TC-CF-2
+  void CheckForMostEfficientFreeSpot_TestCase2() {
+<span class="fc" id="L38">    AutonomousParking car = new AutonomousParking(sensor1, sensor2, mock(IActuator.class));</span>
+<span class="fc" id="L39">    car.currMostEfficientFreeSpot.position = 7;</span>
+<span class="fc" id="L40">    car.currMostEfficientFreeSpot.freeSpotsLength = 7;</span>
+
+    // Suppose we have now tracked 10m free backwards from pos 20
+<span class="fc" id="L43">    car.freeSpotsLength = 10;</span>
+<span class="fc" id="L44">    car.CheckForMostEfficientFreeSpot(20);</span>
+
+    // Assert that most efficient spot has not changed.
+<span class="fc" id="L47">    assertEquals(7, car.currMostEfficientFreeSpot.position);</span>
+<span class="fc" id="L48">    assertEquals(7, car.currMostEfficientFreeSpot.freeSpotsLength);</span>
+<span class="fc" id="L49">  }</span>
+
+  @Test // TC-CF-1
+  void CheckForMostEfficientFreeSpot_TestCase1() {
+<span class="fc" id="L53">    AutonomousParking car = new AutonomousParking(sensor1, sensor2, mock(IActuator.class));</span>
+<span class="fc" id="L54">    car.currMostEfficientFreeSpot.position = 7;</span>
+<span class="fc" id="L55">    car.currMostEfficientFreeSpot.freeSpotsLength = 7;</span>
+
+    // Suppose we have now tracked 5m free backwards from pos 20
+<span class="fc" id="L58">    car.freeSpotsLength = 5;</span>
+<span class="fc" id="L59">    car.CheckForMostEfficientFreeSpot(20);</span>
+
+    // Assert that most efficient spot has not changed.
+<span class="fc" id="L62">    assertEquals(20, car.currMostEfficientFreeSpot.position);</span>
+<span class="fc" id="L63">    assertEquals(5, car.currMostEfficientFreeSpot.freeSpotsLength);</span>
+<span class="fc" id="L64">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span>java (Sep 28, 2026 10:56:02 PM)</div></body></html>

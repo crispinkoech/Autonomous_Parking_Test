@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TestPark.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">java (Sep 28, 2026 10:56:02 PM)</a> &gt; <a href="../../index.html" class="el_group">JUnit</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">autonomous_parking</a> &gt; <span class="el_source">TestPark.java</span></div><h1>TestPark.java</h1><pre class="source lang-java linenums">package autonomous_parking;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+class MockDataSensorIsEmpty extends DataSensor {
+
+<span class="nc" id="L8">    int testCount = 0;</span>
+    int[][] sensorDataSets;
+
+<span class="nc" id="L11">    public MockDataSensorIsEmpty(int[][] sensorDataSets)</span>
+    {
+<span class="nc" id="L13">        this.sensorData = sensorDataSets[0];</span>
+<span class="nc" id="L14">        this.sensorDataSets = sensorDataSets;</span>
+<span class="nc" id="L15">    }</span>
+
+    @Override public void Read(int[] sensorData) 
+    {
+<span class="nc" id="L19">        this.sensorData = new int[] {-1, -1, -1, -1, -1};</span>
+<span class="nc bnc" id="L20" title="All 2 branches missed.">        if (testCount &lt; sensorDataSets.length)</span>
+        {
+<span class="nc" id="L22">            this.sensorData = this.sensorDataSets[testCount];</span>
+<span class="nc" id="L23">            testCount++;</span>
+        }
+<span class="nc" id="L25">    }</span>
+    
+    @Override public int[] GetDataSensor() {
+<span class="nc" id="L28">        this.Read(sensorData);</span>
+<span class="nc" id="L29">        return this.sensorData;</span>
+    }
+}
+
+<span class="nc" id="L33">public class TestPark {</span>
+
+    @Test // Example
+    void TestExample() {
+
+<span class="nc" id="L38">        int[][] sensorData1SetsExp = {</span>
+<span class="nc" id="L39">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L40">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L41">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L42">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L43">                            {180, 180, 180, 180, 180},                           </span>
+                            };
+<span class="nc" id="L45">        int[][] sensorData2SetsExp = {</span>
+<span class="nc" id="L46">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L47">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L48">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L49">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L50">                            {180, 180, 180, 180, 180},</span>
+                            };
+
+<span class="nc" id="L53">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1SetsExp);</span>
+<span class="nc" id="L54">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2SetsExp);</span>
+<span class="nc" id="L55">        IActuator actuator = new Actuator();</span>
+<span class="nc" id="L56">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        for (int i = 0; i &lt; 10; i++) actuator.UpOneStep();</span>
+<span class="nc" id="L58">        boolean doPark = Car.Park();</span>
+<span class="nc" id="L59">        assertEquals(0, Car.freeSpotsLength);</span>
+
+<span class="nc" id="L61">        assertEquals(true, doPark);</span>
+<span class="nc" id="L62">        assertEquals(15, actuator.GetPosition());</span>
+<span class="nc" id="L63">        assertEquals(ParkingStatus.PARKED, Car.currParkingStatus);</span>
+<span class="nc" id="L64">        assertEquals(5, ((MockDataSensorIsEmpty)sensor1).testCount);</span>
+<span class="nc" id="L65">    }</span>
+        
+    @Test // TC_P_01
+    void TestCarAtValidPosition() {
+<span class="nc" id="L69">        int[][] sensorData1Sets = {</span>
+<span class="nc" id="L70">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L71">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L72">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L73">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L74">                            {180, 180, 180, 180, 180},                           </span>
+                            };
+<span class="nc" id="L76">        int[][] sensorData2Sets = {</span>
+<span class="nc" id="L77">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L78">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L79">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L80">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L81">                            {180, 180, 180, 180, 180},</span>
+                            };
+
+<span class="nc" id="L84">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="nc" id="L85">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="nc" id="L86">        IActuator actuator = new Actuator();</span>
+<span class="nc" id="L87">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+        
+        //Car.freeSpotsLength = 5;
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        for (int i = 0; i &lt; 50; i++) actuator.UpOneStep();</span>
+
+<span class="nc" id="L92">        Car.Park();</span>
+
+<span class="nc" id="L94">        assertEquals(55, actuator.GetPosition());</span>
+<span class="nc" id="L95">        assertEquals(0, Car.freeSpotsLength);</span>
+<span class="nc" id="L96">        assertEquals(ParkingStatus.PARKED, Car.currParkingStatus);</span>
+<span class="nc" id="L97">    }</span>
+    @Test // TC_P_02
+    void TestCarAtInvalidPositionButFound() {
+<span class="nc" id="L100">        int[][] sensorData1Sets = {</span>
+<span class="nc" id="L101">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L102">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L103">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L104">                            {100, 100, 100, 100, 100},</span>
+<span class="nc" id="L105">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L106">                            {180, 180, 180, 180, 180},  </span>
+<span class="nc" id="L107">                            {180, 180, 180, 180, 180},      </span>
+<span class="nc" id="L108">                            {180, 180, 180, 180, 180},      </span>
+<span class="nc" id="L109">                            {180, 180, 180, 180, 180},</span>
+                            };
+<span class="nc" id="L111">        int[][] sensorData2Sets = {</span>
+<span class="nc" id="L112">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L113">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L114">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L115">                            {100, 100, 100, 100, 100},</span>
+<span class="nc" id="L116">                            {180, 180, 180, 180, 180},</span>
+<span class="nc" id="L117">                            {180, 180, 180, 180, 180},      </span>
+<span class="nc" id="L118">                            {180, 180, 180, 180, 180},      </span>
+<span class="nc" id="L119">                            {180, 180, 180, 180, 180},      </span>
+<span class="nc" id="L120">                            {180, 180, 180, 180, 180},                              </span>
+                            };
+
+<span class="nc" id="L123">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="nc" id="L124">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="nc" id="L125">        IActuator actuator = new Actuator();</span>
+<span class="nc" id="L126">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+        
+        //Car.freeSpotsLength = 0;
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        for (int i = 0; i &lt; 50; i++) actuator.UpOneStep();</span>
+
+<span class="nc" id="L131">        Car.Park();</span>
+
+<span class="nc" id="L133">        assertEquals(59, actuator.GetPosition());</span>
+<span class="nc" id="L134">        assertEquals(0, Car.freeSpotsLength);</span>
+<span class="nc" id="L135">        assertEquals(ParkingStatus.PARKED, Car.currParkingStatus);</span>
+<span class="nc" id="L136">    }</span>
+    @Test // TC_P_03
+    void TestCarAtInvalidPositionButNotFound() {
+<span class="nc" id="L139">        int[][] sensorData1Sets = {</span>
+<span class="nc" id="L140">                            {100, 100, 100, 100, 100},</span>
+<span class="nc" id="L141">                            {100, 100, 100, 100, 100},</span>
+<span class="nc" id="L142">                            {100, 100, 100, 100, 100},</span>
+<span class="nc" id="L143">                            {100, 100, 100, 100, 100},</span>
+<span class="nc" id="L144">                            {100, 100, 100, 100, 100},</span>
+                            };
+<span class="nc" id="L146">        int[][] sensorData2Sets = {</span>
+<span class="nc" id="L147">                            {100, 100, 100, 100, 100},</span>
+<span class="nc" id="L148">                            {100, 100, 100, 100, 100},</span>
+<span class="nc" id="L149">                            {100, 100, 100, 100, 100},</span>
+<span class="nc" id="L150">                            {100, 100, 100, 100, 100},</span>
+<span class="nc" id="L151">                            {100, 100, 100, 100, 100},</span>
+                            };
+
+<span class="nc" id="L154">        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1Sets);</span>
+<span class="nc" id="L155">        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2Sets);</span>
+<span class="nc" id="L156">        IActuator actuator = new Actuator();</span>
+<span class="nc" id="L157">        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+
+<span class="nc" id="L159">        Car.freeSpotsLength = 0;</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">        for (int i = 0; i &lt; 50; i++) actuator.UpOneStep();</span>
+
+<span class="nc" id="L162">        Car.Park();</span>
+
+<span class="nc" id="L164">        assertEquals(500, actuator.GetPosition());</span>
+<span class="nc" id="L165">        assertEquals(0, Car.freeSpotsLength);</span>
+<span class="nc" id="L166">        assertEquals(ParkingStatus.UNPARKED, Car.currParkingStatus);</span>
+<span class="nc" id="L167">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span>java (Sep 28, 2026 10:56:02 PM)</div></body></html>

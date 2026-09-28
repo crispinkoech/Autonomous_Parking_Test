@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>IT_Park.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">java (Sep 28, 2026 10:56:02 PM)</a> &gt; <a href="../../index.html" class="el_group">JUnit</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">autonomous_parking.Integration</a> &gt; <span class="el_source">IT_Park.java</span></div><h1>IT_Park.java</h1><pre class="source lang-java linenums">package autonomous_parking.Integration;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import autonomous_parking.AutonomousParking;
+import autonomous_parking.AutonomousParkingInterface;
+import autonomous_parking.IActuator;
+import autonomous_parking.IDataSensor;
+import autonomous_parking.CarState;
+
+
+<span class="fc" id="L22">class IT_Park {</span>
+    
+<span class="fc" id="L24">    private static final int[] FREE = {180, 180, 180, 180, 180};</span>
+
+<span class="fc" id="L26">    private static final int[] BLOCKED = {100, 100, 100, 100, 100};</span>
+
+<span class="fc" id="L28">    private static final int[] NOISE = {150, 100, 100, 100, 10};</span>
+
+<span class="fc" id="L30">    private static final int[] OUTOFRANGE = {-1, 220, 10, 500, 20};</span>
+
+
+    private IActuator createMockActuator(AtomicInteger position) 
+    {
+
+<span class="fc" id="L36">        IActuator actuator = mock(IActuator.class);</span>
+
+<span class="fc" id="L38">        when(actuator.GetPosition()).thenAnswer(invocation -&gt; position.get());</span>
+
+<span class="fc" id="L40">        doAnswer(invocation -&gt; {</span>
+<span class="fc" id="L41">            position.incrementAndGet();</span>
+<span class="fc" id="L42">            return null;</span>
+<span class="fc" id="L43">        }).when(actuator).UpOneStep();</span>
+
+<span class="fc" id="L45">        doAnswer(invocation -&gt; {</span>
+<span class="fc" id="L46">            position.decrementAndGet();</span>
+<span class="fc" id="L47">            return null;</span>
+<span class="fc" id="L48">        }).when(actuator).DownOneStep();</span>
+
+<span class="fc" id="L50">        return actuator;</span>
+    }
+
+    private IDataSensor createMockSensor(int[]... sequence) 
+    {
+<span class="fc" id="L55">        IDataSensor sensor = mock(IDataSensor.class);</span>
+            
+<span class="fc" id="L57">        AtomicInteger index = new AtomicInteger(0);</span>
+
+<span class="fc" id="L59">        int[][] currentData = {sequence[0]};</span>
+
+<span class="fc" id="L61">        when(sensor.GetDataSensor())</span>
+<span class="fc" id="L62">            .thenAnswer(invocation -&gt; {</span>
+<span class="fc" id="L63">                int i = index.getAndIncrement();</span>
+
+<span class="fc bfc" id="L65" title="All 2 branches covered.">                if (i &lt; sequence.length) {</span>
+<span class="fc" id="L66">                    return currentData[0] = sequence[i];</span>
+                }
+
+<span class="fc" id="L69">                return currentData[0];</span>
+            });
+
+
+
+<span class="fc" id="L74">        when(sensor.CalculateData())</span>
+<span class="fc" id="L75">            .thenAnswer(invocation -&gt; {</span>
+<span class="fc" id="L76">                int[] data = currentData[0];</span>
+<span class="fc" id="L77">                return Arrays.stream(data).sum() / data.length;</span>
+            });
+
+<span class="fc" id="L80">        when(sensor.FilterNoise())</span>
+<span class="fc" id="L81">            .thenAnswer(invocation -&gt; {</span>
+<span class="fc" id="L82">                int [] data = currentData[0];</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">                return !Arrays.equals(data, NOISE);</span>
+            });
+
+<span class="fc" id="L86">        when(sensor.IsDataInRange())</span>
+<span class="fc" id="L87">            .thenAnswer(invocation -&gt; {</span>
+<span class="fc" id="L88">                int[] data = currentData[0];</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">                return !Arrays.equals(data, OUTOFRANGE);</span>
+            });
+
+<span class="fc" id="L92">        return sensor;</span>
+    }
+
+    private int [][] createRoadConditions(
+        int [][] free,
+        int [][] noise,
+        int [][] ofoutrange
+        )
+    {
+<span class="fc" id="L101">        int roadLength = 500;</span>
+<span class="fc" id="L102">        int[][] roadConditions = new int[roadLength][5];</span>
+
+        // Default everything to BLOCKED
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        for (int i = 0; i &lt; roadLength; i++) {</span>
+<span class="fc" id="L106">            roadConditions[i] = BLOCKED.clone();</span>
+        }
+
+        // FREE ranges
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        for (int[] range : free) {</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">            for (int pos = range[0]; pos &lt;= range[1]; pos++) {</span>
+<span class="fc" id="L112">                roadConditions[pos - 1] = FREE.clone();</span>
+            }
+        }
+
+        // NOISE ranges
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        for (int[] range : noise) {</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">            for (int pos = range[0]; pos &lt;= range[1]; pos++) {</span>
+<span class="fc" id="L119">                roadConditions[pos - 1] = NOISE.clone();</span>
+            }
+        }
+
+        // of out range ranges
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        for (int[] range : ofoutrange) {</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">            for (int pos = range[0]; pos &lt;= range[1]; pos++) {</span>
+<span class="fc" id="L126">                roadConditions[pos - 1] = OUTOFRANGE.clone();</span>
+            }
+        }
+
+<span class="fc" id="L130">        return roadConditions;</span>
+    }
+
+	@Test
+    void testOneFreeParkingSpot() {
+
+<span class="fc" id="L136">        AtomicInteger position = new AtomicInteger(0);</span>
+
+<span class="fc" id="L138">        IActuator actuator = createMockActuator(position);</span>
+
+<span class="fc" id="L140">        int[][] road = createRoadConditions(</span>
+<span class="fc" id="L141">            new int[][] { // Free blocks</span>
+<span class="fc" id="L142">                {1, 2}, // 2</span>
+<span class="fc" id="L143">                {4, 5}, // 2</span>
+<span class="fc" id="L144">                {155, 159}, // 5</span>
+            },
+<span class="fc" id="L146">            new int[][] { // Noise blocks</span>
+<span class="fc" id="L147">                {11, 12}</span>
+            },
+<span class="fc" id="L149">            new int[][] { // Out of range blocks</span>
+<span class="fc" id="L150">                {20, 25}</span>
+            }
+        );
+
+<span class="fc" id="L154">        IDataSensor sensor1 = createMockSensor(road);</span>
+<span class="fc" id="L155">        IDataSensor sensor2 = createMockSensor(road);</span>
+<span class="fc" id="L156">        AutonomousParkingInterface car =  new AutonomousParking(sensor1, sensor2, actuator);</span>
+
+
+        // -------------------------------------------------
+        // 1. PARK
+        // -------------------------------------------------
+
+<span class="fc" id="L163">        boolean parked = car.Park();</span>
+
+<span class="fc" id="L165">        CarState carState = car.WhereIs();</span>
+
+<span class="fc" id="L167">        assertEquals(true, parked);</span>
+
+<span class="fc" id="L169">        assertEquals(159, carState.getPosition());</span>
+<span class="fc" id="L170">    }</span>
+
+    @Test
+    void testTwoFreeParkingSpot() {
+
+<span class="fc" id="L175">        AtomicInteger position = new AtomicInteger(0);</span>
+
+<span class="fc" id="L177">        IActuator actuator = createMockActuator(position);</span>
+
+<span class="fc" id="L179">        int[][] road = createRoadConditions(</span>
+<span class="fc" id="L180">            new int[][] { // Free blocks</span>
+<span class="fc" id="L181">                {1, 2}, // 2</span>
+<span class="fc" id="L182">                {10, 20}, // 11</span>
+<span class="fc" id="L183">                {155, 160}, // 6 -&gt; Choose</span>
+            },
+<span class="fc" id="L185">            new int[][] { // Noise blocks</span>
+<span class="fc" id="L186">                {11, 12}</span>
+            },
+<span class="fc" id="L188">            new int[][] { // Out of range blocks</span>
+<span class="fc" id="L189">                {20, 25}</span>
+            }
+        );
+
+<span class="fc" id="L193">        IDataSensor sensor1 = createMockSensor(road);</span>
+<span class="fc" id="L194">        IDataSensor sensor2 = createMockSensor(road);</span>
+<span class="fc" id="L195">        AutonomousParkingInterface car =  new AutonomousParking(sensor1, sensor2, actuator);</span>
+
+
+        // -------------------------------------------------
+        // 1. PARK
+        // -------------------------------------------------
+
+<span class="fc" id="L202">        boolean parked = car.Park();</span>
+
+<span class="fc" id="L204">        CarState carState = car.WhereIs();</span>
+
+<span class="fc" id="L206">        assertEquals(true, parked);</span>
+
+<span class="fc" id="L208">        assertEquals(160, carState.getPosition());</span>
+<span class="fc" id="L209">    }</span>
+
+    @Test
+    void testNoneFreeParkingSpot() {
+
+<span class="fc" id="L214">        AtomicInteger position = new AtomicInteger(0);</span>
+
+<span class="fc" id="L216">        IActuator actuator = createMockActuator(position);</span>
+
+<span class="fc" id="L218">        int[][] road = createRoadConditions(</span>
+<span class="fc" id="L219">            new int[][] { // Free blocks</span>
+<span class="fc" id="L220">                {1, 2}, // 2</span>
+<span class="fc" id="L221">                {20, 23}, // 4</span>
+<span class="fc" id="L222">                {155, 158}, // 4</span>
+            },
+<span class="fc" id="L224">            new int[][] { // Noise blocks</span>
+<span class="fc" id="L225">                {11, 12}</span>
+            },
+<span class="fc" id="L227">            new int[][] { // Out of range blocks</span>
+<span class="fc" id="L228">                {20, 25}</span>
+            }
+        );
+
+<span class="fc" id="L232">        IDataSensor sensor1 = createMockSensor(road);</span>
+<span class="fc" id="L233">        IDataSensor sensor2 = createMockSensor(road);</span>
+<span class="fc" id="L234">        AutonomousParkingInterface car =  new AutonomousParking(sensor1, sensor2, actuator);</span>
+
+
+        // -------------------------------------------------
+        // 1. PARK
+        // -------------------------------------------------
+
+<span class="fc" id="L241">        boolean parked = car.Park();</span>
+
+<span class="fc" id="L243">        CarState carState = car.WhereIs();</span>
+
+<span class="fc" id="L245">        assertEquals(false, parked);</span>
+
+<span class="fc" id="L247">        assertEquals(500, carState.getPosition());</span>
+<span class="fc" id="L248">    }</span>
+    @Test
+    void testSensorOneBroken() {
+
+<span class="fc" id="L252">        AtomicInteger position = new AtomicInteger(0);</span>
+
+<span class="fc" id="L254">        IActuator actuator = createMockActuator(position);</span>
+
+<span class="fc" id="L256">        int[][] road_2 = createRoadConditions(</span>
+<span class="fc" id="L257">            new int[][] { // Free blocks</span>
+<span class="fc" id="L258">                {1, 2}, // 2</span>
+<span class="fc" id="L259">                {20, 23}, // 4</span>
+<span class="fc" id="L260">                {155, 159}, // 5</span>
+            },
+<span class="fc" id="L262">            new int[][] { // Noise blocks</span>
+<span class="fc" id="L263">                {11, 12}</span>
+            },
+<span class="fc" id="L265">            new int[][] { // Out of range blocks</span>
+<span class="fc" id="L266">                {20, 25}</span>
+            }
+        );
+
+<span class="fc" id="L270">        int[][] road_1 = createRoadConditions(</span>
+<span class="fc" id="L271">            new int[][] { // Free blocks</span>
+<span class="fc" id="L272">                {1, 2}, // 2</span>
+            },
+<span class="fc" id="L274">            new int[][] { // Noise blocks</span>
+<span class="fc" id="L275">                {1, 2}, // 2</span>
+<span class="fc" id="L276">                {20, 23}, // 4</span>
+<span class="fc" id="L277">                {155, 159}, // 4</span>
+            },
+<span class="fc" id="L279">            new int[][] { // Out of range blocks</span>
+<span class="fc" id="L280">                {20, 25}</span>
+            }
+        );
+
+<span class="fc" id="L284">        IDataSensor sensor1 = createMockSensor(road_1);</span>
+<span class="fc" id="L285">        IDataSensor sensor2 = createMockSensor(road_2);</span>
+<span class="fc" id="L286">        AutonomousParkingInterface car =  new AutonomousParking(sensor1, sensor2, actuator);</span>
+
+
+        // -------------------------------------------------
+        // 1. PARK
+        // -------------------------------------------------
+
+<span class="fc" id="L293">        boolean parked = car.Park();</span>
+
+<span class="fc" id="L295">        CarState carState = car.WhereIs();</span>
+
+<span class="fc" id="L297">        assertEquals(true, parked);</span>
+
+<span class="fc" id="L299">        assertEquals(159, carState.getPosition());</span>
+<span class="fc" id="L300">    }</span>
+    @Test
+    void testSensorTwoBroken() {
+
+<span class="fc" id="L304">        AtomicInteger position = new AtomicInteger(0);</span>
+
+<span class="fc" id="L306">        IActuator actuator = createMockActuator(position);</span>
+
+<span class="fc" id="L308">        int[][] road_1 = createRoadConditions(</span>
+<span class="fc" id="L309">            new int[][] { // Free blocks</span>
+<span class="fc" id="L310">                {1, 2}, // 2</span>
+<span class="fc" id="L311">                {20, 23}, // 4</span>
+<span class="fc" id="L312">                {99, 110}, // 12</span>
+            },
+<span class="fc" id="L314">            new int[][] { // Noise blocks</span>
+<span class="fc" id="L315">                {11, 12}</span>
+            },
+<span class="fc" id="L317">            new int[][] { // Out of range blocks</span>
+<span class="fc" id="L318">                {20, 25}</span>
+            }
+        );
+
+<span class="fc" id="L322">        int[][] road_2 = createRoadConditions(</span>
+<span class="fc" id="L323">            new int[][] { // Free blocks</span>
+<span class="fc" id="L324">                {1, 2}, // 2</span>
+            },
+<span class="fc" id="L326">            new int[][] { // Noise blocks</span>
+<span class="fc" id="L327">                {1, 2}, // 2</span>
+<span class="fc" id="L328">                {20, 23}, // 4</span>
+<span class="fc" id="L329">                {99, 110}, // 12</span>
+            },
+<span class="fc" id="L331">            new int[][] { // Out of range blocks</span>
+<span class="fc" id="L332">                {20, 25}</span>
+            }
+        );
+
+<span class="fc" id="L336">        IDataSensor sensor1 = createMockSensor(road_1);</span>
+<span class="fc" id="L337">        IDataSensor sensor2 = createMockSensor(road_2);</span>
+<span class="fc" id="L338">        AutonomousParkingInterface car =  new AutonomousParking(sensor1, sensor2, actuator);</span>
+
+
+        // -------------------------------------------------
+        // 1. PARK
+        // -------------------------------------------------
+
+<span class="fc" id="L345">        boolean parked = car.Park();</span>
+
+<span class="fc" id="L347">        CarState carState = car.WhereIs();</span>
+
+<span class="fc" id="L349">        assertEquals(true, parked);</span>
+
+<span class="fc" id="L351">        assertEquals(110, carState.getPosition());</span>
+<span class="fc" id="L352">    }</span>
+    @Test
+    void testBothSensorsBroken() {
+
+<span class="fc" id="L356">        AtomicInteger position = new AtomicInteger(0);</span>
+
+<span class="fc" id="L358">        IActuator actuator = createMockActuator(position);</span>
+
+<span class="fc" id="L360">        int[][] road_1 = createRoadConditions(</span>
+<span class="fc" id="L361">            new int[][] { // Free blocks</span>
+<span class="fc" id="L362">                {1, 2}, // 2</span>
+            },
+<span class="fc" id="L364">            new int[][] { // Noise blocks</span>
+<span class="fc" id="L365">                {1, 2}, // 2</span>
+<span class="fc" id="L366">                {20, 23}, // 4</span>
+<span class="fc" id="L367">                {99, 110}, // 12</span>
+            },
+<span class="fc" id="L369">            new int[][] { // Out of range blocks</span>
+<span class="fc" id="L370">                {20, 25}</span>
+            }
+        );
+
+<span class="fc" id="L374">        int[][] road_2 = createRoadConditions(</span>
+<span class="fc" id="L375">            new int[][] { // Free blocks</span>
+<span class="fc" id="L376">                {1, 2}, // 2</span>
+            },
+<span class="fc" id="L378">            new int[][] { // Noise blocks</span>
+<span class="fc" id="L379">                {1, 2}, // 2</span>
+<span class="fc" id="L380">                {20, 23}, // 4</span>
+<span class="fc" id="L381">                {99, 110}, // 12</span>
+            },
+<span class="fc" id="L383">            new int[][] { // Out of range blocks</span>
+<span class="fc" id="L384">                {20, 25}</span>
+            }
+        );
+
+<span class="fc" id="L388">        IDataSensor sensor1 = createMockSensor(road_1);</span>
+<span class="fc" id="L389">        IDataSensor sensor2 = createMockSensor(road_2);</span>
+<span class="fc" id="L390">        AutonomousParkingInterface car =  new AutonomousParking(sensor1, sensor2, actuator);</span>
+
+
+        // -------------------------------------------------
+        // 1. PARK
+        // -------------------------------------------------
+
+<span class="fc" id="L397">        boolean parked = car.Park();</span>
+
+<span class="fc" id="L399">        CarState carState = car.WhereIs();</span>
+
+<span class="fc" id="L401">        assertEquals(false, parked);</span>
+
+<span class="fc" id="L403">        assertEquals(500, carState.getPosition());</span>
+<span class="fc" id="L404">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span>java (Sep 28, 2026 10:56:02 PM)</div></body></html>
