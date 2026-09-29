@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TestWhereIs.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">java (Sep 28, 2026 10:56:02 PM)</a> &gt; <a href="../../index.html" class="el_group">JUnit</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">autonomous_parking</a> &gt; <span class="el_source">TestWhereIs.java</span></div><h1>TestWhereIs.java</h1><pre class="source lang-java linenums">package autonomous_parking;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+<span class="fc" id="L8">public class TestWhereIs {</span>
+<span class="fc" id="L9">    private static IDataSensor sensor1 = mock(IDataSensor.class);</span>
+<span class="fc" id="L10">    private static IDataSensor sensor2 = mock(IDataSensor.class);</span>
+
+    @Test //TC-WI-01
+    void WhereIsRejectsInvalidPosition() {
+<span class="fc" id="L14">        IActuator actuator = mock(IActuator.class);</span>
+<span class="fc" id="L15">        AutonomousParking car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+<span class="fc" id="L16">        when(actuator.GetPosition()).thenReturn(-1);</span>
+<span class="pc" id="L17">        IllegalStateException error = assertThrows( IllegalStateException.class, () -&gt; car.WhereIs() );</span>
+<span class="fc" id="L18">        assertEquals(&quot;Invalid car position&quot;, error.getMessage());</span>
+
+<span class="fc" id="L20">        when(actuator.GetPosition()).thenReturn(501);</span>
+<span class="pc" id="L21">        error = assertThrows( IllegalStateException.class, () -&gt; car.WhereIs() );</span>
+<span class="fc" id="L22">        assertEquals(&quot;Invalid car position&quot;, error.getMessage());</span>
+<span class="fc" id="L23">        System.out.println(error.getMessage());</span>
+<span class="fc" id="L24">    }</span>
+
+    @Test //TC-WI-02
+    void WhereIsReturnsParkedState(){
+<span class="fc" id="L28">        IActuator actuator = mock(IActuator.class);</span>
+<span class="fc" id="L29">        AutonomousParking car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+
+<span class="fc" id="L31">        when(actuator.GetPosition()).thenReturn(100);</span>
+<span class="fc" id="L32">        car.currParkingStatus = ParkingStatus.PARKED;</span>
+
+<span class="fc" id="L34">        CarState state = car.WhereIs();</span>
+
+<span class="fc" id="L36">        assertEquals(100, state.position);</span>
+<span class="fc" id="L37">        assertEquals(ParkingStatus.PARKED, state.CurrParkingStatus);</span>
+<span class="fc" id="L38">    }</span>
+
+    @Test //TC-WI-03
+    void WhereIsReturnsUnparkedState(){
+<span class="fc" id="L42">        IActuator actuator = mock(IActuator.class);</span>
+<span class="fc" id="L43">        AutonomousParking car = new AutonomousParking(sensor1, sensor2, actuator);</span>
+
+<span class="fc" id="L45">        when(actuator.GetPosition()).thenReturn(100);</span>
+<span class="fc" id="L46">        car.currParkingStatus = ParkingStatus.UNPARKED;</span>
+
+<span class="fc" id="L48">        CarState state = car.WhereIs();</span>
+
+<span class="fc" id="L50">        assertEquals(100, state.position);</span>
+<span class="fc" id="L51">        assertEquals(ParkingStatus.UNPARKED, state.CurrParkingStatus);</span>
+<span class="fc" id="L52">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span>java (Sep 28, 2026 10:56:02 PM)</div></body></html>

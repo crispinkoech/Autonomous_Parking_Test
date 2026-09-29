@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>AutonomousParking.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">java (Sep 28, 2026 10:56:02 PM)</a> &gt; <a href="../../index.html" class="el_group">JUnit</a> &gt; <a href="../index.html" class="el_bundle">src/main/java</a> &gt; <a href="index.source.html" class="el_package">autonomous_parking</a> &gt; <span class="el_source">AutonomousParking.java</span></div><h1>AutonomousParking.java</h1><pre class="source lang-java linenums">package autonomous_parking;
+
+public class AutonomousParking implements AutonomousParkingInterface {
+  
+  /* Constants */
+  public static final int ROAD_MIN_STRETCH = 0;
+  public static final int ROAD_MAX_STRETCH = 500;
+  public static final int PARKING_SPOT_LENGTH = 5;
+  public static final int MIN_SENSOR_DETECTED_FREE_SPOT = 150;
+  
+  /* Car and parking lot status */
+  ParkingStatus currParkingStatus;
+  int freeSpotsLength;
+
+  /* Sensors */
+  private IDataSensor sensor1;
+  private IDataSensor sensor2;
+  private IActuator actuator;
+
+  /* Parking Status */
+<span class="fc" id="L21">  FreeSpots currMostEfficientFreeSpot = new FreeSpots(0, 0);</span>
+
+  /* Set sensors and initial car/parking state */
+<span class="fc" id="L24">  public AutonomousParking(IDataSensor sensor1, IDataSensor sensor2, IActuator actuator) {</span>
+<span class="fc" id="L25">    this.sensor1 = sensor1;</span>
+<span class="fc" id="L26">    this.sensor2 = sensor2;</span>
+<span class="fc" id="L27">    this.actuator = actuator;</span>
+
+<span class="fc" id="L29">    this.currParkingStatus = ParkingStatus.UNPARKED;</span>
+<span class="fc" id="L30">    this.freeSpotsLength = 0;</span>
+<span class="fc" id="L31">  }</span>
+
+
+  /**
+   * Description:
+   *  - Moves the car forward by 1 meter and checks whether there is an empty space
+   *    to the right of the car in the new position.
+   *  - If there is free space to the right, freeSpotsLength is incremented by 1;
+   *    otherwise, it is reset to zero.
+   *  - Checks/Updates the most efficient free spots via`CheckForMostEfficientFreeSpot` method.
+   *
+   * Inputs:
+   * - Queries for the car's current position
+   * - Checks if there is free space to the right using `IsEmpty` subroutine
+   *
+   * Outputs:
+   * - Returns the parkingState (position and freeSpots)
+   *
+   * Pre-condition:
+   * - 0 &lt;= carState.position &lt;= 499
+   * - car.ParkingState = UNPARKED
+   *
+   * Post-condition:
+   * - 1 &lt;= carState.position &lt;= 500
+   * - carParkingState = UNPARKED
+   *
+   * Test-cases (Annotated as TC-1, 2, etc):
+   *   ________________________________________________________________________________________________________________________
+   *  | Conditions/Actions                                        | TC-MF-1 | TC-MF-2 | TC-MF-3 | TC-MF-4 | TC-MF-5 | TC-MF-6 |
+   *  |-----------------------------------------------------------|---------|---------|---------|---------|---------|---------|
+   *  | c1: 0 &lt;= position &lt;= 499                                  |   True  |   True  |   True  |   True  |   True  |   False |
+   *  | c2: carParkingState = UNPARKED                            |   True  |   True  |   True  |   True  |   False |    -    |
+   *  | c3: isEmpty() &gt;= 150cm                                    |   True  |   True  |   False |   False |    -    |    -    |
+   *  | c4: position == 499                                       |   True  |   False |   True  |   False |    -    |    -    |
+   *  |-----------------------------------------------------------|---------|---------|---------|---------|---------|---------|
+   *  | a1: wrong input/state                                     |    -    |    -    |    -    |    -    |    X    |    X    |
+   *  | a2: position += 1, freeSpots = 0                          |    -    |    -    |    -    |    X    |    -    |    -    |
+   *  | a2: position += 1, checkMostEffientSpot(), freeSpots = 0  |    -    |    -    |    X    |    -    |    -    |    -    |
+   *  | a3: position += 1, freeSpots += 1                         |    -    |    X    |    -    |    -    |    -    |    -    |
+   *  | a4: position += 1, freeSpots += 1, checkMostEffientSpot() |    X    |    -    |    -    |    -    |    -    |    -    |
+   *  |___________________________________________________________|_________|_________|_________|_________|_________|_________|
+   *
+   */
+  public FreeSpots MoveForward() {
+    /* Check that the car position is still in range (0 to 499) */
+<span class="fc" id="L76">    CarState carState = this.WhereIs();</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    if (carState.position == ROAD_MAX_STRETCH) {</span>
+<span class="fc" id="L78">      throw new IllegalStateException(&quot;Invalid car position&quot;);</span>
+    }
+    /* Get prev car position */
+<span class="fc" id="L81">    int prevCarPosition = carState.position;</span>
+
+    /* Check that the car is not parked */
+<span class="fc bfc" id="L84" title="All 2 branches covered.">    if (carState.CurrParkingStatus == ParkingStatus.PARKED) {</span>
+<span class="fc" id="L85">      throw new IllegalStateException(&quot;Car is already parked&quot;);</span>
+    }
+
+    /* Increment car position */
+<span class="fc" id="L89">    this.actuator.UpOneStep();</span>
+
+    /* Increment or reset the detected free space */
+<span class="fc" id="L92">    int distanceToClosestObject = this.IsEmpty();</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">    if (distanceToClosestObject &gt;= MIN_SENSOR_DETECTED_FREE_SPOT) {</span>
+<span class="fc" id="L94">      freeSpotsLength += 1;</span>
+      /* Check if the current space is the most efficient if you've reached the end of the road */
+<span class="fc" id="L96">      int currentCarPosition = this.actuator.GetPosition();</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">      if (currentCarPosition == ROAD_MAX_STRETCH) {</span>
+<span class="fc" id="L98">          this.CheckForMostEfficientFreeSpot(currentCarPosition);</span>
+      }
+<span class="fc" id="L100">    } else {</span>
+      /* Encounter blocking point on the right hand side */
+<span class="fc" id="L102">      this.CheckForMostEfficientFreeSpot(prevCarPosition);</span>
+<span class="fc" id="L103">      freeSpotsLength = 0;</span>
+    }
+
+<span class="fc" id="L106">    return new FreeSpots(this.actuator.GetPosition(), freeSpotsLength);</span>
+  }
+
+    /**
+   * Description:
+   *  - Updates the internal state for the most efficient parking spot, if any
+   *
+   * Inputs:
+   *  - Position of the car
+   *  - The number of free/empty 1m spots backwards from the provided position
+   *  - Current/Previous most efficient parking spot
+   *
+   * Outputs:
+   * - Updates the current most efficient parking spot.
+   *
+   * Pre-condition:
+   *  - Current most efficient parking spot's length is either zero, or &gt;= 5m.
+   *
+   * Post-condition:
+   *  - Updated most efficient parking spot's length is either zero, or &gt;= 5m.
+   *
+   * Test-cases (Annotated as TC-1, 2, etc):
+   *   ____________________________________________________________________________________________________
+   *  | Conditions/Actions                                        | TC-CF-1 | TC-CF-2 | TC-CF-3 | TC-CF-4 |
+   *  |-----------------------------------------------------------|---------|---------|---------|---------|
+   *  | c2: freeSpotsLen &gt;= 5m                                    |   True  |   True  |   True  |   False |
+   *  | c3: currMostEfficientSpot.length                          |   &gt;=5m  |   &gt;=5m  |    0    |    -    |
+   *  | c4: freeSpotsLen &lt; currMostEfficientSpot.freeSpotsLen     |   True  |   False |    -    |    -    |
+   *  |-----------------------------------------------------------|---------|---------|---------|---------|
+   *  | a1: do nothing                                            |    -    |    X    |    -    |    X    |
+   *  | a3: currMostEfficientSpot = (position, freeSpotsLen)      |    X    |    -    |    X    |    -    |
+   *  |___________________________________________________________|_________|_________|_________|_________|
+   *
+   */
+  void CheckForMostEfficientFreeSpot(int position) {
+<span class="fc bfc" id="L141" title="All 2 branches covered.">    if (freeSpotsLength &lt; PARKING_SPOT_LENGTH) {</span>
+<span class="fc" id="L142">      return;</span>
+    }
+
+    /* Check and register the most efficient parking spot */
+<span class="fc" id="L146">    int currentBestLength = currMostEfficientFreeSpot.freeSpotsLength;</span>
+<span class="fc bfc" id="L147" title="All 4 branches covered.">    if (currentBestLength == 0 || freeSpotsLength &lt; currentBestLength) {</span>
+<span class="fc" id="L148">      currMostEfficientFreeSpot = new FreeSpots(position, freeSpotsLength);</span>
+    }
+<span class="fc" id="L150">  }</span>
+
+  /**
+   * Description:
+   * - Query both sensors at least 5 times
+   * - Filter noise from each of sensor
+   * - Return the distance to the nearest object on the right-hand side of the car
+   *
+   * Inputs:
+   * - int[] SENSOR_DATA1 = {data_1, data_2, data_3, data_4, data_5};
+   * - int[] SENSOR_DATA2 = {data_1, data_2, data_3, data_4, data_5};
+   *
+   * Outputs:
+   * - Return a filtered distance value in centimetres
+   *
+   * Assumptions:
+   * - Sensor data will be given as an array of 5 elements
+   * - A sensor is considered invalid if its readings have a deviation greater than 80 cm:
+   *   + deviation =  Max reading - Min reading
+   * - Method to calculate overall sensor data is an average of 5 times
+   *
+   * Pre-condition:
+   * - Both sensors data are available
+   * - Sensor data range must be &gt;= 0 and &lt;= 200
+   * - The sensors can be queried at least 5 times.
+   *
+   * Post-condition:
+   * - If both sensors are invalid, return -1 
+   * - If one sensor is valid, return its filtered data 
+   * - If both are valid, return the minimum filtered data of them
+   *
+   * Test-cases:
+   * - Boundary Values
+   * - Equivalence Classes
+   * - Decision Tables
+   *   ____________________________________________________________________________________________________________
+   *  | Conditions/Actions                                      |TC_IE_01     | TC_IE_02  | TC_IE_03  | TC_IT_04  |
+   *  |---------------------------------------------------------|-------------|-----------|-----------|-----------|
+   *  | c1: S1 state                                            |  V          |  V        |  I        |  I        |
+   *  | c2: S2 state                                            |  V          |  I        |  V        |  I        |
+   *  |---------------------------------------------------------|-------------|-----------|-----------|-----------|
+   *  | a1: IsEmpty() = Min(avg(S1), avg(S2))                   |  X          |  -        |  -        |  -        |
+   *  | a2: IsEmpty() = S1                                      |  -          |  X        |  -        |  -        |
+   *  | a3: IsEmpty() = S2                                      |  -          |  -        |  X        |  -        |
+   *  | a4: IsEmpty() = -1                                      |  -          |  -        |  -        |  X        |
+   *  |_________________________________________________________|_____________|___________|___________|___________|
+   *
+   *  V = Valid
+   *  I = Invalid
+   * 
+   * __________________________________________________________________________________________
+   * | Conditions/Actions                         | TC_IE_05 | TC_IE_06 | TC_IE_07 | TC_IE_08 |
+   * |--------------------------------------------|----------|----------|----------|----------|
+   * | c1: S1 average value                       |    &lt; 0   |     0    |   200    |   &gt; 200  |
+   * | c2: S2 average value                       |    &lt; 0   |     0    |   200    |   &gt; 200  |
+   * |--------------------------------------------|----------|----------|----------|----------|
+   * | a3: Sensor state                           | Invalid  |  Valid   |  Valid   | Invalid  |
+   * | a1: IsEmpty() = -1                         |    X     |    -     |    -     |    X     |
+   * | a2: IsEmpty() = Min(avg(S1), avg(S2))      |    -     |    X     |    X     |    -     |
+   * |--------------------------------------------|----------|----------|----------|----------|
+   * 
+   * _______________________________________________________________________________
+   * | Conditions/Actions                         | TC_IE_09 | TC_IE_10 | TC_IE_11 |
+   * |--------------------------------------------|----------|----------|----------|
+   * | c1: S1 average value                       |    &lt; 80  |    80    |    &gt; 80  |
+   * | c2: S2 average value                       |    &lt; 80  |    80    |    &gt; 80  |
+   * |--------------------------------------------|----------|----------|----------|
+   * | a3: Sensor state                           |  Invalid |  Valid   |  Invalid |
+   * | a1: IsEmpty() = -1                         |    X     |    -     |    X     |
+   * | a2: IsEmpty() = Min(avg(S1), avg(S2))      |    -     |    X     |    -     |
+   * |--------------------------------------------|----------|----------|----------|
+   * - (Refer to the Test_Specification.xlsm OR the report for more details)
+   */
+
+  public int IsEmpty() {
+<span class="fc" id="L225">    int filteredDataSensor1 = -1;</span>
+<span class="fc" id="L226">    int filteredDataSensor2 = -1;</span>
+<span class="fc" id="L227">    int filteredData = -1;</span>
+
+    /* Read data from sensors */
+<span class="fc" id="L230">    sensor1.GetDataSensor();</span>
+<span class="fc" id="L231">    sensor2.GetDataSensor();</span>
+
+    /* Filter noise and check if sensor data is in range */
+<span class="fc bfc" id="L234" title="All 4 branches covered.">    boolean isSensor1Valid = sensor1.FilterNoise() &amp;&amp; sensor1.IsDataInRange();</span>
+<span class="fc bfc" id="L235" title="All 4 branches covered.">    boolean isSensor2Valid = sensor2.FilterNoise() &amp;&amp; sensor2.IsDataInRange();</span>
+
+    /* Calculate filtered data from valid sensors */
+<span class="fc bfc" id="L238" title="All 2 branches covered.">    if (isSensor1Valid) {</span>
+<span class="fc" id="L239">        filteredDataSensor1 = sensor1.CalculateData();</span>
+    }
+
+<span class="fc bfc" id="L242" title="All 2 branches covered.">    if (isSensor2Valid) {</span>
+<span class="fc" id="L243">        filteredDataSensor2 = sensor2.CalculateData();</span>
+    }
+
+    /* Determine the final filtered data based on valid sensor readings */
+<span class="fc bfc" id="L247" title="All 4 branches covered.">    if (filteredDataSensor1 != -1 &amp;&amp; filteredDataSensor2 != -1) {</span>
+<span class="fc" id="L248">        filteredData = Math.min(filteredDataSensor1, filteredDataSensor2);</span>
+<span class="fc" id="L249">    }</span>
+<span class="fc bfc" id="L250" title="All 2 branches covered.">    else if (filteredDataSensor1 != -1) {</span>
+<span class="fc" id="L251">        filteredData = filteredDataSensor1;</span>
+<span class="fc" id="L252">    }</span>
+<span class="fc bfc" id="L253" title="All 2 branches covered.">    else if (filteredDataSensor2 != -1) {</span>
+<span class="fc" id="L254">        filteredData = filteredDataSensor2;</span>
+    }
+
+    /* Return the filtered data, which represents the distance to the nearest obstacle */
+    /* If both sensors are invalid, return -1 
+       If one sensor is valid, return its data 
+       If both are valid, return the minimum of them */
+<span class="fc" id="L261">    return filteredData;</span>
+  }
+
+  /**
+   * Description:
+   * - Moves the car backwards by 1 meter
+   * - Checks whether there is empty space to the right of the car
+   * - If there is free space, incremented freeSpots by 1; otherwise reset it to zero.
+   * 
+   * Inputs:
+   * - Queries for the car's current position
+   * - Queries for free space to the right using `IsEmpty` method
+   * 
+   * Outputs:
+   * - Returns the parking state of the car (position and freeSpots detected)
+   *
+   * Pre-condition:
+   * - 1 &lt;= position &lt;= 500
+   * - carParkingState = UNPARKED
+   *
+   * Post-condition:
+   * - 0 &lt;= postion &lt;= 499
+   * - carParkingState = UNPARKED
+   * 
+   * Test-cases (Annotated as TC-1, 2, etc):
+   *   ___________________________________________________________________________
+   *  | Conditions/Actions                | TC-MB-1 | TC-MB-2 | TC-MB-3 | TC-MB-4 |
+   *  |-----------------------------------|---------|---------|---------|---------|
+   *  | c1: 1 &lt;= position &lt;= 500          |   True  |   True  |   True  |  False  |
+   *  | c2: carParkingState = UNPARKED    |   True  |   True  |   False |    -    |
+   *  | c3: isEmpty() &gt;= 150cm            |   True  |   False |    -    |    -    |
+   *  |-----------------------------------|---------|---------|---------|---------|
+   *  | a1: wrong input/state             |    -    |    -    |    X    |    X    |
+   *  | a2: position -= 1, freeSpots = 0  |    -    |    X    |    -    |    -    |
+   *  | a3: position -= 1, freeSpots += 1 |    X    |    -    |    -    |    -    |
+   *  |___________________________________|_________|_________|_________|_________|
+  */
+  public FreeSpots MoveBackward() {
+    /* Check that the car position is still in range (1 to 500) */
+<span class="fc" id="L300">    CarState carState = this.WhereIs();</span>
+
+
+    /* Check that the car is not parked */
+<span class="fc bfc" id="L304" title="All 2 branches covered.">    if (carState.CurrParkingStatus == ParkingStatus.PARKED) {</span>
+<span class="fc" id="L305">      throw new IllegalStateException(&quot;Car is already parked&quot;);</span>
+    }
+
+    /* Decrement car position */
+<span class="fc" id="L309">    this.actuator.DownOneStep();</span>
+
+    /* Increment or reset the detected free space */
+<span class="fc" id="L312">    int distanceToClosestObject = this.IsEmpty();</span>
+<span class="fc bfc" id="L313" title="All 2 branches covered.">    if (distanceToClosestObject &gt;= MIN_SENSOR_DETECTED_FREE_SPOT) {</span>
+<span class="fc" id="L314">      freeSpotsLength += 1;</span>
+<span class="fc" id="L315">    } else {</span>
+<span class="fc" id="L316">      freeSpotsLength = 0;</span>
+    }
+
+<span class="fc" id="L319">    return new FreeSpots(this.actuator.GetPosition(), freeSpotsLength);</span>
+  }
+
+/**
+   * Description:
+   * - Perform a pre-programmed reverse parallel parking maneuver
+   * - Park when car in the free parking spot position
+   * - Otherwise move the car forwards toward the end of the stretch until free parking spot is found
+   *
+   * Inputs:
+   * - currCarPosition
+   * - freeSpotsLength
+   *
+   * Outputs:
+   * - Return a boolean value
+   *    + True: Car is parked succesfully
+   *    + False: Car is not parked succesfully
+   *
+   * Assumptions:
+   * - A valid parking space is a continuous free stretch of at least 5 meters.
+   * - The car detects parking availability while moving forward using isEmpty().
+   * - The car is considered to be at a ready parking space when a valid 5-meter
+   *   free stretch has been detected.
+   * - The parking maneuver is pre-programmed and does not require sensor
+   *   feedback during the maneuver.
+   * - The actuator signals used to perform the parking maneuver are not
+   *   modeled in this phase.
+   * - If no suitable parking space is found before the end of the street,
+   *   the car remains unparked.
+   *
+   * Pre-condition:
+   * - Car's parking status is currently UNPARKED
+   * - Car's position is in the range between 0 and 500 meters of the stretch
+   *
+   * Post-condition:
+   * - If a suitable free parking stretch of at least 5 meters is detected:
+   *   + The car moves to the end of the stretch.
+   *   + The pre-programmed reverse parallel parking maneuver is performed.
+   *   + The car's parking status becomes PARKED.
+   *
+   * - If no suitable parking stretch is detected before the end of the street:
+   *   + The car's position is 500 meters.
+   *   + The car's parking status remains UNPARKED.
+   *
+   * Test-cases:
+   * Decision Table for Park()
+   *
+   *   __________________________________________________________________________________________
+   *  | Conditions/Actions                                      | TC_P_01  | TC_P_02  | TC_P_03 |
+   *  |---------------------------------------------------------|----------|----------|---------|
+   *  | c1: Already at valid parking stretch?                   |  T       |  F       | F       |
+   *  | (Car can park, no need to move forward)                 |          |          |         |
+   *  | c2: Valid stretch found ahead?                          |  -       |  T       | F       |
+   *  | (Car will move forward and a guaranteed free parking spot before reaching the end)      |
+   *  | c3: End of street reached?                              |  -       |  F       | T       |
+   *  | (Car will move forward but no free parking spot is found at the end of the stretch)     |
+   *  |---------------------------------------------------------|----------|----------|---------|
+   *  | a1: Move forward                                        |  -       |  X       | X       |
+   *  | a2: Final status = PARKED                               |  X       |  X       | -       |
+   *  | a3: Final status = UNPARKED                             |  -       |  -       | X       |
+   *  |_________________________________________________________|__________|__________|_________|
+   * 
+   * - (Refer to the Test_Specification.xlsm for more details)
+   */
+  public boolean Park() {
+    /* Keep moving forward reaching a upper road limit */
+<span class="fc bfc" id="L385" title="All 2 branches covered.">    while (this.actuator.GetPosition() &lt; ROAD_MAX_STRETCH)</span>
+    {
+<span class="fc" id="L387">      this.MoveForward(); // move 1m ahead and update car status</span>
+    }
+
+    /* Could not find any valid parking spot till the end of the road */ 
+<span class="fc bfc" id="L391" title="All 2 branches covered.">    if (currMostEfficientFreeSpot.freeSpotsLength == 0)</span>
+    {
+      /* Return Park unsuccessfully */
+<span class="fc" id="L394">      currParkingStatus = ParkingStatus.UNPARKED;</span>
+<span class="fc" id="L395">      return false;</span>
+    }
+
+    /* Keep moving backward until parking or reaching a lower road limit */
+<span class="fc bfc" id="L399" title="All 2 branches covered.">    while (currMostEfficientFreeSpot.position != this.actuator.GetPosition())</span>
+    {
+<span class="fc" id="L401">      this.MoveBackward();  // move 1m backward and update car status</span>
+    }
+
+    /* Park successfully */
+<span class="fc" id="L405">    currParkingStatus = ParkingStatus.PARKED;</span>
+    /* Reset free spots length if car is parked successfully */
+<span class="fc" id="L407">    freeSpotsLength = 0;</span>
+     /* Reset current most efficient free spot */
+<span class="fc" id="L409">    currMostEfficientFreeSpot = new FreeSpots(0, 0);</span>
+    /* Return  */
+<span class="fc" id="L411">    return true;</span>
+  }
+
+  /**
+   * Description:
+   * - Moves the car forward (of the start of the 5m parking stretch) and to the left
+   *   of the parking spot.
+   * - If the car is already unparked, the above functionality is skipped.
+   * 
+   * Inputs:
+   * - Queries the car's parked state.
+   *
+   * Outputs:
+   * - Modifies the car's parked state (if the car is parked).
+   *
+   * Assumption:
+   * - The car's length is &lt; 5m, such that the extra space offers wiggle room to unpark
+   *   and maintain the initial position before parking
+   *
+   * Pre-condition:
+   * - 1 &lt;= carState.position &lt;= 500
+   *
+   * Post-condition:
+   * - carParkingState = UNPARKED
+   * - carState.position remains unchanged.
+   *
+   * Test-cases (Annotated as TC-1, 2, etc):
+   *   _________________________________________________________________________________________
+   *  | Conditions/Actions                                        | TC-UP-1 | TC-UP-2 | TC-UP-3 |
+   *  |-----------------------------------------------------------|---------|---------|---------|
+   *  | c1: 1 &lt;= position &lt;= 500                                  |   True  |   True  |   False |
+   *  | c1: carParkingState = PARKED                              |   True  |   False |    -    |
+   *  |-----------------------------------------------------------|---------|---------|---------|
+   *  | a1: wrong input/state                                     |    -    |    -    |    X    |
+   *  | a2: do nothing                                            |    -    |    X    |    -    |
+   *  | a3: carParkingState = UNPARKED, car.position is the same  |    X    |    -    |    -    |
+   *  |___________________________________________________________|_________|_________|_________|
+   *
+   */
+  public void UnPark() {
+    /* Check that the car position is still in range (0 to 500) */
+<span class="fc" id="L452">    CarState carState = this.WhereIs();</span>
+<span class="pc bpc" id="L453" title="1 of 4 branches missed.">    if (carState.position &lt; 1 || carState.position &gt; 500) {</span>
+<span class="fc" id="L454">      throw new IllegalStateException(&quot;Invalid car position&quot;);</span>
+    }
+
+    /* Update the unparked status only if the car is parked */
+<span class="fc bfc" id="L458" title="All 2 branches covered.">    if (carState.CurrParkingStatus == ParkingStatus.PARKED) {</span>
+<span class="fc" id="L459">      this.currParkingStatus = ParkingStatus.UNPARKED;</span>
+    }
+<span class="fc" id="L461">  }</span>
+
+/**
+ * Description
+ * - Returns the current position of the car in the street as well as its (un)parked status.
+ *    Inputs:
+ *      - Access the car's position that is an attribute of the AutonomousParking class.
+ *      - Access the car's status with is an attribute of the AutonomousParking class.
+ *
+ *    Outputs:
+ *      - Returns the car's current position and parking status through the data type CarState.
+ *
+ * Pre-condition:
+ * - Car's position must be within the defined range 0 &lt;= currCarPosition &lt;= 500
+ * - Parking status could be either PARKED or UNPARKED.
+ *
+ * Post-condition:
+ * - Updated car's position (0 &lt;= currCarPosition &lt;= 500) and parking status (PARKED or UNPARKED)
+ *
+ * Test-cases: Combination of Decision Table + Boundary value conditions
+ * - Decision Table
+ *  _______________________________________________________________________________________
+ * | Conditions/Actions                               |   TC-WI-01   TC-WI-01   TC-WI-01   |
+ * |--------------------------------------------------|------------------------------------|
+ * | c1: Position valid? 0 &lt;= currCarPosition &lt;= 500  |     F           T          T       |
+ * | c2: Parking status = PARKED?                     |    -            T          F       |
+ * |--------------------------------------------------|------------------------------------|
+ * | a1: wrong input/state                            |    X            -          -       |
+ * | a2: currCarPosition                              |    -            X          X       |
+ * | a3: currentParkingStatus = PARKED                |    -            X          -       |
+ * | a4: currentParkingStatus = UNPARKED              |    -            -          X       |
+ * |__________________________________________________|____________________________________|
+ *
+ * - Boundary value condition
+ *  _________________________________________________________
+ * | VARIABLE           |   TC-WI-01   TC-WI-01   TC-WI-01  |
+ * |--------------------|-----------------------------------|
+ * | currCarPosition    |     &lt; 0        100         &gt; 500  |
+ * |--------------------|-----------------------------------|
+ * | MethodState output |   Invalid     Valid     Invalid   |
+ * ---------------------------------------------------------|
+*/
+  public CarState WhereIs() {
+<span class="fc" id="L504">    int position = this.actuator.GetPosition();</span>
+<span class="fc bfc" id="L505" title="All 4 branches covered.">    if (position &lt; 0 || position &gt; 500){</span>
+<span class="fc" id="L506">      throw new IllegalStateException(&quot;Invalid car position&quot;);</span>
+    }
+<span class="fc" id="L508">    return new CarState(position , currParkingStatus);</span>
+
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span>java (Sep 28, 2026 10:56:02 PM)</div></body></html>
