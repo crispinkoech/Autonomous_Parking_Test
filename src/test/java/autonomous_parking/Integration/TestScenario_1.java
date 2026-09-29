@@ -10,8 +10,16 @@ import autonomous_parking.AutonomousParking;
 import autonomous_parking.DataSensor;
 import autonomous_parking.ParkingStatus;
 import autonomous_parking.Actuator;
+/* First Scenario: 2 sufficient parking spots, 1 not sufficient parking spot
+    • Starts at the beginning of the street,
+    • Moves along the street and scan the available parking places,
+    • Moves backwards until the most efficient parking place (the smallest available parking where it
+    can still park safely),
+    • Parks the car,
+    • Unparks the car and drive to the end of the street
+*/
 
-public class TestAutonomousParking {
+public class TestScenario_1 {
     private static Actuator actuator = new Actuator();
 
     private static DataSensor sensor1 = spy(new DataSensor());

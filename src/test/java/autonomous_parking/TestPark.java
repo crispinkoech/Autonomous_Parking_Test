@@ -32,38 +32,6 @@ class MockDataSensorIsEmpty extends DataSensor {
 
 public class TestPark {
 
-    @Test // Example
-    void TestExample() {
-
-        int[][] sensorData1SetsExp = {
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},                           
-                            };
-        int[][] sensorData2SetsExp = {
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            {180, 180, 180, 180, 180},
-                            };
-
-        IDataSensor sensor1 = new MockDataSensorIsEmpty(sensorData1SetsExp);
-        IDataSensor sensor2 = new MockDataSensorIsEmpty(sensorData2SetsExp);
-        IActuator actuator = new Actuator();
-        AutonomousParking Car = new AutonomousParking(sensor1, sensor2, actuator);
-        for (int i = 0; i < 10; i++) actuator.UpOneStep();
-        boolean doPark = Car.Park();
-        assertEquals(0, Car.freeSpotsLength);
-
-        assertEquals(true, doPark);
-        assertEquals(15, actuator.GetPosition());
-        assertEquals(ParkingStatus.PARKED, Car.currParkingStatus);
-        assertEquals(5, ((MockDataSensorIsEmpty)sensor1).testCount);
-    }
-        
     @Test // TC_P_01
     void TestCarAtValidPosition() {
         int[][] sensorData1Sets = {
