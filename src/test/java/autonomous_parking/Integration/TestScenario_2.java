@@ -39,8 +39,6 @@ class TestScenario_2 {
 
     private IDataSensor createMockSensor(int[]... sequence) 
     {
-        // IDataSensor sensor = mock(IDataSensor.class);
-
         IDataSensor sensor = spy(new DataSensor());
             
         AtomicInteger index = new AtomicInteger(0);
