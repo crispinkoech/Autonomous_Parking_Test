@@ -8,12 +8,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 
+import autonomous_parking.Actuator;
 import autonomous_parking.AutonomousParking;
 import autonomous_parking.AutonomousParkingInterface;
 import autonomous_parking.IActuator;
 import autonomous_parking.IDataSensor;
 import autonomous_parking.ParkingStatus;
 import autonomous_parking.CarState;
+import autonomous_parking.DataSensor;
 
 
 /* Second Scenario: Could not find any sufficient parking slots
@@ -35,30 +37,11 @@ class TestScenario_2 {
 
     private static final int[] OUTOFRANGE = {-1, 220, 10, 500, 20};
 
-
-    private IActuator createMockActuator(AtomicInteger position) 
-    {
-
-        IActuator actuator = mock(IActuator.class);
-
-        when(actuator.GetPosition()).thenAnswer(invocation -> position.get());
-
-        doAnswer(invocation -> {
-            position.incrementAndGet();
-            return null;
-        }).when(actuator).UpOneStep();
-
-        doAnswer(invocation -> {
-            position.decrementAndGet();
-            return null;
-        }).when(actuator).DownOneStep();
-
-        return actuator;
-    }
-
     private IDataSensor createMockSensor(int[]... sequence) 
     {
-        IDataSensor sensor = mock(IDataSensor.class);
+        // IDataSensor sensor = mock(IDataSensor.class);
+
+        IDataSensor sensor = spy(new DataSensor());
             
         AtomicInteger index = new AtomicInteger(0);
 
@@ -72,29 +55,8 @@ class TestScenario_2 {
                     return currentData[0] = sequence[i];
                 }
 
-                return currentData[0];
+                return invocation.callRealMethod();
             });
-
-
-
-        when(sensor.CalculateData())
-            .thenAnswer(invocation -> {
-                int[] data = currentData[0];
-                return Arrays.stream(data).sum() / data.length;
-            });
-
-        when(sensor.FilterNoise())
-            .thenAnswer(invocation -> {
-                int [] data = currentData[0];
-                return !Arrays.equals(data, NOISE);
-            });
-
-        when(sensor.IsDataInRange())
-            .thenAnswer(invocation -> {
-                int[] data = currentData[0];
-                return !Arrays.equals(data, OUTOFRANGE);
-            });
-
         return sensor;
     }
 
@@ -140,8 +102,7 @@ class TestScenario_2 {
     void testCouldNotFindAnySpots() {
 
         /* Starting at the beginning of the street */
-        AtomicInteger position = new AtomicInteger(0);
-        IActuator actuator = createMockActuator(position);
+        IActuator actuator = new Actuator();
 
         /* Encounters 3 parking spaces that are insufficient safe parking */
         int[][] road_1 = createRoadConditions(
