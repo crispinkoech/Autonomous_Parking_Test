@@ -321,10 +321,15 @@ public class AutonomousParking implements AutonomousParkingInterface {
 
 /**
    * Description:
-   * - Move the car forward while scanning the parking slots
-   * - Move the car forward until the end of the street
-   * - Move the car backward to park if the most efficient parking spot is available
-   * - Else stay at the end of the road (position 500m)
+   *  - Start from the beginning of the street.
+   *  - Move forward until 500 m.
+   *  - MoveForward() continuously detects free stretches.
+   *  - Every completed free stretch ≥ 5 m is considered.
+   *  - Check the most efficient spot as the shortest valid stretch.
+   *  - After reaching 500 m:
+   *  - no valid stretch → return false, remain UNPARKED;
+   *  - valid stretch → move backward to the most efficient spot position.
+   *  - Set status to PARKED and reset temporary state.
    *
    * Inputs:
    * - currCarPosition
@@ -334,18 +339,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - Return a boolean value
    *    + True: Car is parked succesfully, update parking status to parked
    *    + False: Car is not parked succesfully, update parking status to unparked
-   *
-   * Assumptions:
-   *  Start from the beginning of the street.
-   *  Move forward until 500 m.
-   *  MoveForward() continuously detects free stretches.
-   *  Every completed free stretch ≥ 5 m is considered.
-   *  Check the most efficient spot as the shortest valid stretch.
-   *  After reaching 500 m:
-   *  no valid stretch → return false, remain UNPARKED;
-   *  valid stretch → move backward to the most efficient spot position.
-   *  Set status to PARKED and reset temporary state.
-   *
+   * 
    * Pre-condition:
    * - Car's parking status is currently UNPARKED
    * - Car's position is at the start of the street
