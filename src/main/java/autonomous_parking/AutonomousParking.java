@@ -40,50 +40,42 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *  - Checks/Updates the most efficient free spots via`CheckForMostEfficientFreeSpot` method.
    *
    * Inputs:
-   * - Queries for the car's current position
    * - Checks if there is free space to the right using `IsEmpty` subroutine
    *
    * Outputs:
    * - Returns the parkingState (position and freeSpots)
    *
    * Pre-condition:
-   * - 0 <= carState.position <= 499
    * - car.ParkingState = UNPARKED
    *
    * Post-condition:
-   * - 1 <= carState.position <= 500
    * - carParkingState = UNPARKED
    *
    * Test-cases (Annotated as TC-1, 2, etc):
-   *   ________________________________________________________________________________________________________________________
-   *  | Conditions/Actions                                        | TC-MF-1 | TC-MF-2 | TC-MF-3 | TC-MF-4 | TC-MF-5 | TC-MF-6 |
-   *  |-----------------------------------------------------------|---------|---------|---------|---------|---------|---------|
-   *  | c1: 0 <= position <= 499                                  |   True  |   True  |   True  |   True  |   True  |   False |
-   *  | c2: carParkingState = UNPARKED                            |   True  |   True  |   True  |   True  |   False |    -    |
-   *  | c3: isEmpty() >= 150cm                                    |   True  |   True  |   False |   False |    -    |    -    |
-   *  | c4: position == 499                                       |   True  |   False |   True  |   False |    -    |    -    |
-   *  |-----------------------------------------------------------|---------|---------|---------|---------|---------|---------|
-   *  | a1: wrong input/state                                     |    -    |    -    |    -    |    -    |    X    |    X    |
-   *  | a2: position += 1, freeSpots = 0                          |    -    |    -    |    -    |    X    |    -    |    -    |
-   *  | a2: position += 1, checkMostEffientSpot(), freeSpots = 0  |    -    |    -    |    X    |    -    |    -    |    -    |
-   *  | a3: position += 1, freeSpots += 1                         |    -    |    X    |    -    |    -    |    -    |    -    |
-   *  | a4: position += 1, freeSpots += 1, checkMostEffientSpot() |    X    |    -    |    -    |    -    |    -    |    -    |
-   *  |___________________________________________________________|_________|_________|_________|_________|_________|_________|
+   *   ______________________________________________________________________________________________________________
+   *  | Conditions/Actions                                        | TC-MF-1 | TC-MF-2 | TC-MF-3 | TC-MF-4 | TC-MF-5 |
+   *  |-----------------------------------------------------------|---------|---------|---------|---------|---------|
+   *  | c1: carParkingState = UNPARKED                            |   True  |   True  |   True  |   True  |   False |
+   *  | c2: isEmpty() >= 150cm                                    |   True  |   True  |   False |   False |    -    |
+   *  | c3: position == 499                                       |   True  |   False |   True  |   False |    -    |
+   *  |-----------------------------------------------------------|---------|---------|---------|---------|---------|
+   *  | a1: wrong input/state                                     |    -    |    -    |    -    |    -    |    X    |
+   *  | a2: position += 1, freeSpots = 0                          |    -    |    -    |    -    |    X    |    -    |
+   *  | a2: position += 1, checkMostEffientSpot(), freeSpots = 0  |    -    |    -    |    X    |    -    |    -    |
+   *  | a3: position += 1, freeSpots += 1                         |    -    |    X    |    -    |    -    |    -    |
+   *  | a4: position += 1, freeSpots += 1, checkMostEffientSpot() |    X    |    -    |    -    |    -    |    -    |
+   *  |___________________________________________________________|_________|_________|_________|_________|_________|
    *
    */
   public FreeSpots MoveForward() {
-    /* Check that the car position is still in range (0 to 499) */
     CarState carState = this.WhereIs();
-    if (carState.position == ROAD_MAX_STRETCH) {
-      throw new IllegalStateException("Invalid car position");
-    }
-    /* Get prev car position */
-    int prevCarPosition = carState.position;
-
     /* Check that the car is not parked */
     if (carState.CurrParkingStatus == ParkingStatus.PARKED) {
       throw new IllegalStateException("Car is already parked");
     }
+    
+    /* Get prev car position */
+    int prevCarPosition = carState.position;
 
     /* Increment car position */
     this.actuator.UpOneStep();
@@ -268,38 +260,31 @@ public class AutonomousParking implements AutonomousParkingInterface {
    * - If there is free space, incremented freeSpots by 1; otherwise reset it to zero.
    * 
    * Inputs:
-   * - Queries for the car's current position
    * - Queries for free space to the right using `IsEmpty` method
    * 
    * Outputs:
    * - Returns the parking state of the car (position and freeSpots detected)
    *
    * Pre-condition:
-   * - 1 <= position <= 500
    * - carParkingState = UNPARKED
    *
    * Post-condition:
-   * - 0 <= postion <= 499
    * - carParkingState = UNPARKED
    * 
    * Test-cases (Annotated as TC-1, 2, etc):
-   *   ___________________________________________________________________________
-   *  | Conditions/Actions                | TC-MB-1 | TC-MB-2 | TC-MB-3 | TC-MB-4 |
-   *  |-----------------------------------|---------|---------|---------|---------|
-   *  | c1: 1 <= position <= 500          |   True  |   True  |   True  |  False  |
-   *  | c2: carParkingState = UNPARKED    |   True  |   True  |   False |    -    |
-   *  | c3: isEmpty() >= 150cm            |   True  |   False |    -    |    -    |
-   *  |-----------------------------------|---------|---------|---------|---------|
-   *  | a1: wrong input/state             |    -    |    -    |    X    |    X    |
-   *  | a2: position -= 1, freeSpots = 0  |    -    |    X    |    -    |    -    |
-   *  | a3: position -= 1, freeSpots += 1 |    X    |    -    |    -    |    -    |
-   *  |___________________________________|_________|_________|_________|_________|
+   *   __________________________________________________________________
+   *  | Conditions/Actions                | TC-MB-1 | TC-MB-2 | TC-MB-3 |
+   *  |-----------------------------------|---------|---------|---------|
+   *  | c2: carParkingState = UNPARKED    |   True  |   True  |   False |
+   *  | c3: isEmpty() >= 150cm            |   True  |   False |    -    |
+   *  |-----------------------------------|---------|---------|---------|
+   *  | a1: wrong input/state             |    -    |    -    |    X    |
+   *  | a2: position -= 1, freeSpots = 0  |    -    |    X    |    -    |
+   *  | a3: position -= 1, freeSpots += 1 |    X    |    -    |    -    |
+   *  |___________________________________|_________|_________|_________|
   */
   public FreeSpots MoveBackward() {
-    /* Check that the car position is still in range (1 to 500) */
     CarState carState = this.WhereIs();
-
-
     /* Check that the car is not parked */
     if (carState.CurrParkingStatus == ParkingStatus.PARKED) {
       throw new IllegalStateException("Car is already parked");
@@ -419,7 +404,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *   and maintain the initial position before parking
    *
    * Pre-condition:
-   * - 1 <= carState.position <= 500
+   * - carState.position >= 1
    *
    * Post-condition:
    * - carParkingState = UNPARKED
@@ -429,7 +414,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *   _________________________________________________________________________________________
    *  | Conditions/Actions                                        | TC-UP-1 | TC-UP-2 | TC-UP-3 |
    *  |-----------------------------------------------------------|---------|---------|---------|
-   *  | c1: 1 <= position <= 500                                  |   True  |   True  |   False |
+   *  | c1: position >= 1                                         |   True  |   True  |   False |
    *  | c1: carParkingState = PARKED                              |   True  |   False |    -    |
    *  |-----------------------------------------------------------|---------|---------|---------|
    *  | a1: wrong input/state                                     |    -    |    -    |    X    |
@@ -439,9 +424,9 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *
    */
   public void UnPark() {
-    /* Check that the car position is still in range (0 to 500) */
+    /* Check lower bound of position (`WhereIs` method checks the upper bound) */
     CarState carState = this.WhereIs();
-    if (carState.position < 1 || carState.position > 500) {
+    if (carState.position < 1) {
       throw new IllegalStateException("Invalid car position");
     }
 
