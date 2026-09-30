@@ -80,6 +80,8 @@ Autonomous_Parking_Test/
 │               ├── TestPark.java
 │               ├── TestUnpark.java
 │               └── TestWhereIs.java
+|               ├── TestDataSensor.java
+|               ├── TestActuator.java
 │
 ├── Documents/
 │   ├── Coverage/
@@ -109,6 +111,8 @@ JUnit 5 tests cover the main behaviors of the parking controller:
 * `UnPark()`
 * `WhereIs()`
 * `CheckForMostEfficientFreeSpot()`
+* `Actuator()`
+* `DataSensor()`
 
 The sensor and actuator dependencies are abstracted behind `IDataSensor` and `IActuator`.
 
@@ -150,6 +154,8 @@ Test cases are identified in the source code using identifiers such as:
 * `TC_UP` — `UnPark()`
 * `TC_WI` — `WhereIs()`
 * `TC_CF` — `CheckForMostEfficientFreeSpot()`
+* `TC_AC` — `Actuator()`
+* `TC_SS` — `DataSensor()`
 
 ## Sensor Processing
 
