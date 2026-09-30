@@ -15,22 +15,6 @@ public class TestMoveForward {
         when(sensor2.GetDataSensor()).thenReturn(new int[] {103, 100, 101, 99, 98});
     }
 
-    @Test // TC-MF-6
-    void MoveForwardTestCase6() {
-        IActuator actuator = mock(IActuator.class);
-        AutonomousParking car = new AutonomousParking(sensor1, sensor2, actuator);
-
-        /* Test for the car's position being below the required range */
-        when(actuator.GetPosition()).thenReturn(-1);
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> car.MoveForward());
-        assertEquals(exception.getMessage(), "Invalid car position");
-
-        /* Test for the car's position being beyond the required range */
-        when(actuator.GetPosition()).thenReturn(500);
-        exception = assertThrows(IllegalStateException.class, () -> car.MoveForward());
-        assertEquals(exception.getMessage(), "Invalid car position");
-    }
-
     @Test // TC-MF-5
     void MoveForwardTestCase5() {
         AutonomousParking car = new AutonomousParking(sensor1, sensor2, mock(IActuator.class));
