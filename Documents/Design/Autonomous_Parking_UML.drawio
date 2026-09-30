@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="ChatGPT" pages="2">
   <diagram id="architecture" name="Architecture">
-    <mxGraphModel dx="1030" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+    <mxGraphModel dx="2060" dy="1252" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -10,23 +10,20 @@
         <mxCell id="api" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;AutonomousParkingInterface&lt;/b&gt;&lt;hr&gt;+ MoveForward() : FreeSpots&lt;br&gt;+ MoveBackward() : FreeSpots&lt;br&gt;+ IsEmpty() : int&lt;br&gt;+ Park() : boolean&lt;br&gt;+ UnPark() : void&lt;br&gt;+ WhereIs() : CarState" vertex="1">
           <mxGeometry height="155" width="220" x="110" y="130" as="geometry" />
         </mxCell>
-        <mxCell id="ids" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;IDataSensor&lt;/b&gt;&lt;hr&gt;+ Read() : void&lt;br&gt;+ GetDataSensor() : int[]&lt;br&gt;+ IsDataInRange(int[] sensorData) : boolean&lt;br&gt;+ FilterNoise(int[] sensorData) : boolean&lt;br&gt;+ CalculateData(int[] sensorData) : int" vertex="1">
+        <mxCell id="ids" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&amp;lt;&amp;lt;interface&amp;gt;&amp;gt;&lt;br&gt;&lt;b&gt;IDataSensor&lt;/b&gt;&lt;hr&gt;+ Read(int[] sensorData) : void&lt;br&gt;+ GetDataSensor() : int[]&lt;br&gt;+ IsDataInRange() : boolean&lt;br&gt;+ FilterNoise() : boolean&lt;br&gt;+ CalculateData() : int" vertex="1">
           <mxGeometry height="150" width="260" x="120" y="660" as="geometry" />
         </mxCell>
-        <mxCell id="ap" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;AutonomousParking&lt;/b&gt;&lt;hr&gt;- currCarPosition : int&lt;br&gt;- currParkingStatus : ParkingStatus&lt;br&gt;- freeSpotsLength : int&lt;br&gt;- sensor1 : IDataSensor&lt;br&gt;- sensor2 : IDataSensor&lt;div&gt;- actuator:&amp;nbsp; IActuator&lt;/div&gt;&lt;div&gt;-&amp;nbsp;currMostEfficientFreeSpot:&amp;nbsp;FreeSpots&lt;br&gt;&lt;hr&gt;+ AutonomousParking(sensor1, sensor2)&lt;br&gt;+ MoveForward() : FreeSpots&lt;br&gt;+ MoveBackward() : FreeSpots&lt;br&gt;+ IsEmpty() : int&lt;br&gt;+ Park() : boolean&lt;br&gt;+ UnPark() : void&lt;br&gt;+ WhereIs() : CarState&lt;/div&gt;" vertex="1">
+        <mxCell id="ap" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;AutonomousParking&lt;/b&gt;&lt;hr&gt;- currCarPosition : int&lt;br&gt;- currParkingStatus : ParkingStatus&lt;br&gt;- freeSpotsLength : int&lt;br&gt;- sensor1 : IDataSensor&lt;br&gt;- sensor2 : IDataSensor&lt;div&gt;- actuator:&amp;nbsp; IActuator&lt;/div&gt;&lt;div&gt;-&amp;nbsp;currMostEfficientFreeSpot:&amp;nbsp;FreeSpots&lt;br&gt;&lt;hr&gt;+ AutonomousParking(sensor1, sensor2, actuator)&lt;br&gt;+ MoveForward() : FreeSpots&lt;br&gt;+ MoveBackward() : FreeSpots&lt;br&gt;+ IsEmpty() : int&lt;br&gt;+ Park() : boolean&lt;br&gt;+ UnPark() : void&lt;br&gt;+ WhereIs() : CarState&lt;/div&gt;" vertex="1">
           <mxGeometry height="310" width="500" x="570" y="100" as="geometry" />
         </mxCell>
-        <mxCell id="ds" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;DataSensor&lt;/b&gt;&lt;hr&gt;- sensorData : int[]&lt;hr&gt;+ Read() : void&lt;br&gt;+ GetDataSensor() : int[]&lt;br&gt;+ IsDataInRange(int[] sensorData) : boolean&lt;br&gt;+ FilterNoise(int[] sensorData) : boolean&lt;br&gt;+ CalculateData(int[] sensorData) : int" vertex="1">
+        <mxCell id="ds" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;DataSensor&lt;/b&gt;&lt;hr&gt;- sensorData : int[]&lt;hr&gt;+ Read(int[] sensorData) : void&lt;br&gt;+ GetDataSensor() : int[]&lt;br&gt;+ IsDataInRange() : boolean&lt;br&gt;+ FilterNoise() : boolean&lt;br&gt;+ CalculateData() : int" vertex="1">
           <mxGeometry height="155" width="280" x="110" y="910" as="geometry" />
         </mxCell>
-        <mxCell id="cs" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;CarState&lt;/b&gt;&lt;hr&gt;+ position : int&lt;br&gt;+ CurrParkingStatus : ParkingStatus&lt;hr&gt;Car state returned by WhereIs()" vertex="1">
-          <mxGeometry height="110" width="220" x="400" y="580" as="geometry" />
-        </mxCell>
         <mxCell id="fs" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;b&gt;FreeSpots&lt;/b&gt;&lt;hr&gt;+ position : int&lt;br&gt;+ freeSpotsLength : int&lt;hr&gt;Result returned by MoveForward / MoveBackward" vertex="1">
-          <mxGeometry height="110" width="290" x="690" y="580" as="geometry" />
+          <mxGeometry height="130" width="290" x="690" y="580" as="geometry" />
         </mxCell>
         <mxCell id="ps" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#fff2cc;strokeColor=#d6b656;" value="&lt;b&gt;ParkingStatus&lt;/b&gt;&lt;hr&gt;&lt;&lt;enumeration&gt;&gt;&lt;br&gt;PARKED&lt;br&gt;UNPARKED" vertex="1">
-          <mxGeometry height="110" width="220" x="1010" y="580" as="geometry" />
+          <mxGeometry height="130" width="220" x="1010" y="580" as="geometry" />
         </mxCell>
         <mxCell id="env" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;strokeWidth=1.5;fillColor=#f5f5f5;strokeColor=#666666;" value="&lt;b&gt;Environment / Road&lt;/b&gt;&lt;br&gt;Road range: 0–500 m&lt;br&gt;Parking requires ≥ 5 m continuous free space&lt;br&gt;Sensor threshold for free space: ≥ 150 cm" vertex="1">
           <mxGeometry height="130" width="780" x="430" y="730" as="geometry" />
@@ -37,8 +34,10 @@
         <mxCell id="e2" edge="1" parent="1" source="ds" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;endArrow=block;dashed=1;html=1;" target="ids" value="implements">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="e5" edge="1" parent="1" source="ap" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;endArrow=open;html=1;" target="cs" value="returns">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="e5" edge="1" parent="1" source="ap" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;endArrow=open;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" value="returns">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="510" y="580" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="e6" edge="1" parent="1" source="ap" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;endArrow=open;html=1;" target="fs" value="returns">
           <mxGeometry relative="1" as="geometry">
@@ -136,6 +135,9 @@
           <mxGeometry relative="1" x="-0.25" y="3" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="2s7f7C4AQCitdep_pSF_-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingTop=8;spacingLeft=10;strokeWidth=1.5;fillColor=#60a917;strokeColor=#2D7600;fontColor=#ffffff;" value="&lt;b&gt;CarState&lt;/b&gt;&lt;br&gt;&lt;div&gt;&lt;div&gt;&amp;nbsp;+ position: int&lt;/div&gt;&lt;div&gt;&amp;nbsp;+ CurrParkingStatus:&amp;nbsp;CurrParkingStatus&lt;/div&gt;&lt;hr&gt;+ getPosition() : int&lt;br&gt;+ getParkingStatus() : ParkingStatus&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(255, 255, 255);&quot;&gt;Result returned by WhereIs&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="240" x="430" y="576.25" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
