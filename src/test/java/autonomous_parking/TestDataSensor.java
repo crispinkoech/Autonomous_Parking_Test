@@ -7,32 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class TestDataSensor {
-    class MockDataSensorIsEmpty extends DataSensor {
-
-        int testCount = 0;
-        int[][] sensorDataSets;
-    
-        public MockDataSensorIsEmpty(int[][] sensorDataSets)
-        {
-            this.sensorData = sensorDataSets[0];
-            this.sensorDataSets = sensorDataSets;
-        }
-    
-        @Override public void Read(int[] sensorData) 
-        {
-            this.sensorData = new int[] {-1, -1, -1, -1, -1};
-            if (testCount < sensorDataSets.length)
-            {
-                this.sensorData = this.sensorDataSets[testCount];
-                testCount++;
-            }
-        }
-        
-        @Override public int[] GetDataSensor() {
-            this.Read(sensorData);
-            return this.sensorData;
-        }
-    }
 
     @Test // TC_SSG_1
     void TestSensorRead() {
