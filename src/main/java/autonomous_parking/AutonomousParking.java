@@ -321,61 +321,52 @@ public class AutonomousParking implements AutonomousParkingInterface {
 
 /**
    * Description:
-   * - Perform a pre-programmed reverse parallel parking maneuver
-   * - Park when car in the free parking spot position
-   * - Otherwise move the car forwards toward the end of the stretch until free parking spot is found
+   *  - Start from the beginning of the street.
+   *  - Move forward until 500 m.
+   *  - MoveForward() continuously detects free stretches.
+   *  - Every completed free stretch ≥ 5 m is considered.
+   *  - Check the most efficient spot as the shortest valid stretch.
+   *  - After reaching 500 m:
+   *  - no valid stretch → return false, remain UNPARKED;
+   *  - valid stretch → move backward to the most efficient spot position.
+   *  - Set status to PARKED and reset temporary state.
    *
    * Inputs:
    * - currCarPosition
-   * - freeSpotsLength
+   * - currMostEfficientFreeSpot
    *
    * Outputs:
    * - Return a boolean value
-   *    + True: Car is parked succesfully
-   *    + False: Car is not parked succesfully
-   *
-   * Assumptions:
-   * - A valid parking space is a continuous free stretch of at least 5 meters.
-   * - The car detects parking availability while moving forward using isEmpty().
-   * - The car is considered to be at a ready parking space when a valid 5-meter
-   *   free stretch has been detected.
-   * - The parking maneuver is pre-programmed and does not require sensor
-   *   feedback during the maneuver.
-   * - The actuator signals used to perform the parking maneuver are not
-   *   modeled in this phase.
-   * - If no suitable parking space is found before the end of the street,
-   *   the car remains unparked.
-   *
+   *    + True: Car is parked succesfully, update parking status to parked
+   *    + False: Car is not parked succesfully, update parking status to unparked
+   * 
    * Pre-condition:
    * - Car's parking status is currently UNPARKED
-   * - Car's position is in the range between 0 and 500 meters of the stretch
+   * - Car's position is at the start of the street
    *
    * Post-condition:
-   * - If a suitable free parking stretch of at least 5 meters is detected:
-   *   + The car moves to the end of the stretch.
+   * - If the most sufficient parking spot of at least 5 meters is detected:
+   *   + The car moves backward to this spot
    *   + The pre-programmed reverse parallel parking maneuver is performed.
    *   + The car's parking status becomes PARKED.
    *
-   * - If no suitable parking stretch is detected before the end of the street:
+   * - If not any parking spot is detected at the end of the street:
    *   + The car's position is 500 meters.
    *   + The car's parking status remains UNPARKED.
    *
    * Test-cases:
    * Decision Table for Park()
-   *
    *   __________________________________________________________________________________________
    *  | Conditions/Actions                                      | TC_P_01  | TC_P_02  | TC_P_03 |
    *  |---------------------------------------------------------|----------|----------|---------|
-   *  | c1: Already at valid parking stretch?                   |  T       |  F       | F       |
-   *  | (Car can park, no need to move forward)                 |          |          |         |
-   *  | c2: Valid stretch found ahead?                          |  -       |  T       | F       |
-   *  | (Car will move forward and a guaranteed free parking spot before reaching the end)      |
-   *  | c3: End of street reached?                              |  -       |  F       | T       |
-   *  | (Car will move forward but no free parking spot is found at the end of the stretch)     |
+   *  | c1: A Valid parking stretch found?                      |  T       |  F       | F       |
+   *  | c2: Multiple valid stretches found?                     |  F       |  T       | F       |
    *  |---------------------------------------------------------|----------|----------|---------|
-   *  | a1: Move forward                                        |  -       |  X       | X       |
-   *  | a2: Final status = PARKED                               |  X       |  X       | -       |
-   *  | a3: Final status = UNPARKED                             |  -       |  -       | X       |
+   *  | a1: Stay at 500 m                                       |  -       |  -       | x       |
+   *  | a2: Select valid parking stretch                        |  x       |  x       | -       |
+   *  | a3: Move backward to selected spot                      |  x       |  x       | -       |
+   *  | a4: Final decision PARKED                               |  x       |  x       | -       |
+   *  | a5: Final decision UNPARKED                             |  -       |  -       | x       |
    *  |_________________________________________________________|__________|__________|_________|
    * 
    * - (Refer to the Test_Specification.xlsm for more details)
