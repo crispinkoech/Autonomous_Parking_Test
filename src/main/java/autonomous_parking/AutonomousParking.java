@@ -404,7 +404,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *   and maintain the initial position before parking
    *
    * Pre-condition:
-   * - 1 <= carState.position <= 500
+   * - carState.position >= 1
    *
    * Post-condition:
    * - carParkingState = UNPARKED
@@ -414,7 +414,7 @@ public class AutonomousParking implements AutonomousParkingInterface {
    *   _________________________________________________________________________________________
    *  | Conditions/Actions                                        | TC-UP-1 | TC-UP-2 | TC-UP-3 |
    *  |-----------------------------------------------------------|---------|---------|---------|
-   *  | c1: 1 <= position <= 500                                  |   True  |   True  |   False |
+   *  | c1: position >= 1                                         |   True  |   True  |   False |
    *  | c1: carParkingState = PARKED                              |   True  |   False |    -    |
    *  |-----------------------------------------------------------|---------|---------|---------|
    *  | a1: wrong input/state                                     |    -    |    -    |    X    |

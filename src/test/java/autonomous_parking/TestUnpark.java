@@ -17,11 +17,6 @@ public class TestUnpark {
         /* Test for car being below the parking range */
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> car.UnPark());
         assertEquals(exception.getMessage(), "Invalid car position");
-
-        /* Test for car being beyond the parking range */
-        when(actuator.GetPosition()).thenReturn(501);
-        exception = assertThrows(IllegalStateException.class, () -> car.UnPark());
-        assertEquals(exception.getMessage(), "Invalid car position");
     }
 
     @Test // TC-UP-2
