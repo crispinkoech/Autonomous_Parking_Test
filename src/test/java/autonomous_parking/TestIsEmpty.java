@@ -49,7 +49,7 @@ public class TestIsEmpty {
         assertEquals(30, filteredSensorData);
 
     }
-    @Test // TC_IE_02
+    @Test // TC_IE_03
     void TestAbnormalSensorData1() {
         int[][] sensorData1Sets = {
                             {10, 100, 25, 44, 88},                    
@@ -66,7 +66,7 @@ public class TestIsEmpty {
         assertEquals(102, filteredSensorData);
 
     }
-    @Test // TC_IE_03
+    @Test // TC_IE_02
     void TestAbnormalSensorData2() {
         int[][] sensorData1Sets = {
                             {150, 120, 155, 145, 160},                    
